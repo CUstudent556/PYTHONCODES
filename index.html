@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteXL Python Solutions</title>
+    <style>
+        /* CSS Reset & Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-muted: #a0aec0;
+            --accent: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: var(--text-main);
+            background-color: #0f172a;
+            /* Animated Colorful Background for the Glass Effect */
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Apple-Style Glassmorphism Class */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            animation: fadeInDown 0.8s ease-out;
+            position: relative;
+        }
+
+        /* --- NEW CREDENTIALS BADGE --- */
+        .author-badge {
+            display: inline-block;
+            background: rgba(0, 242, 254, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #fff, #a0aec0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        p.subtitle {
+            font-size: 1.2em;
+            color: var(--accent);
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Accordion Module Styling */
+        .module {
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .module:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .module-header {
+            padding: 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.4em;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .module-header::after {
+            content: '+';
+            font-size: 1.5em;
+            font-weight: 400;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--accent);
+        }
+
+        .module.active .module-header::after {
+            transform: rotate(45deg);
+        }
+
+        .module-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .module.active .module-content {
+            max-height: 25000px; /* Large enough to hold all code */
+        }
+
+        .module-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .module-content li {
+            padding: 20px 25px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        /* --- SUB-HEADER STYLING FOR SECTIONS --- */
+        .sub-header {
+            background: rgba(0, 242, 254, 0.08);
+            color: var(--accent);
+            padding: 12px 25px !important;
+            font-weight: 800;
+            font-size: 1.05em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border) !important;
+        }
+
+        .topic-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+
+        /* Sleek Buttons */
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Code Block Styling */
+        .code-container {
+            display: none;
+            margin-top: 15px;
+            background: #1e1e1e;
+            border-radius: 12px;
+            position: relative;
+            padding: 50px 20px 20px;
+            border: 1px solid #333;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .code-container.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        pre { margin: 0; overflow-x: auto; }
+        code { font-family: 'Fira Code', monospace; color: #a6e22e; font-size: 0.95em; line-height: 1.5; }
+
+        /* The Toast Popup */
+        #toast {
+            position: fixed; bottom: 40px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 15px 30px; color: #fff; font-weight: 600; font-size: 1.1em;
+            opacity: 0; z-index: 9999;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex; align-items: center; gap: 10px;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        footer { text-align: center; padding: 30px; margin-top: 40px; font-size: 0.9em; color: var(--text-muted); border-top: 1px solid var(--glass-border); }
+
+        /* Animations */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="author-badge">Made by Harsh Vardhan Singh | UID: 25lbcs3302</div>
+        <h1>ByteXL Python Hub</h1>
+        <p class="subtitle">Complete Study Guide & Reference</p>
+    </header>
+
+    <main>
+        <div class="module glass active"><div class="module-header">Python Syntax & Data Types</div><div class="module-content"><ul id="module-1-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">Control Structures</div><div class="module-content"><ul id="module-2-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">Introduction to Data Structures</div><div class="module-content"><ul id="module-3-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">Functions</div><div class="module-content"><ul id="module-4-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">Object-Oriented Programming (OOP)</div><div class="module-content"><ul id="module-5-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">Applied Programming Skills</div><div class="module-content"><ul id="module-6-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">Packages</div><div class="module-content"><ul id="module-7-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">GUI Programming</div><div class="module-content"><ul id="module-8-list"></ul></div></div>
+        <div class="module glass"><div class="module-header">Asynchronous Programming</div><div class="module-content"><ul id="module-9-list"></ul></div></div>
+    </main>
+
+    <footer>
+        Made by <strong>Harsh Vardhan Singh</strong> | UID: 25LBCS3302
+    </footer>
+
+    <div id="toast" class="glass">✅ Copied!!</div>
+
+    <script>
+        // --- DATA STRUCTURE WITH SUB-SECTIONS ---
+        // To make a category header, add `isHeader: true` to the object.
+        const courseData = {
+            "module-1-list": [
+                // SUB-SECTION 1
+                { isHeader: true, title: "Introduction to Python" },
+                { title: "1. Print a Statement", code: `statement = input()\nprint(statement)` },
+                { title: "2. Take input from...", code: `statement = input()\nprint(statement)` },
+                { title: "3. Print User's Name", code: `statement = input()\nprint(statement)` },
+                { title: "4. Print a Sentence...", code: `statement = input()\nprint(statement)` },
+                { title: "5. Echo the User's...", code: `statement = input()\nprint(statement)` },
+                { title: "6. Print Favorite...", code: `statement = input()\nprint(statement)` },
+                { title: "7. Repeat a Hobby", code: `statement = input()\nprint(statement)` },
+                { title: "8. Print User...", code: `name = input()\ncolor = input()\ncity = input()\n\nprint(name)\nprint(color)\nprint(city)` },
+
+                // SUB-SECTION 2
+                { isHeader: true, title: "Variables and Data Types" },
+                { title: "1. Variable naming...", code: `a=int(input())\nb=int(input())\nprint('Value of x:',a)\nprint('Value of X:',b)` },
+                { title: "2. Welcome...", code: `greeting = "Hello"\nname = input()\nprint(f"{greeting}, {name}!")` },
+                { title: "3. Print a String", code: `msg=input()\nprint(msg)` },
+                { title: "4. Square of a...", code: `a=float(input())\nb = a*a\nprint(b)` },
+                { title: "5. Celsius to...", code: `celsius= int(input())\nfahrenheit = (celsius * 9/5) + 32\nprint(fahrenheit)\n\n` },
+                { title: "6. Arithmetic with...", code: `a=int(input())\nb=float(input())\nc=int(input())\nadd=a+b+c\ndot=a*b*c\nprint(add)\nprint(f"{dot:,.2f}")` },
+                { title: "7. Identify Data Type", code: `s= input().strip()\nmapping= {"true":"boolean","false":"Boolean"}\nif s in mapping:\n  print(mapping[s])\nelif s.isdigit():\n    print("integer")\nelif s.replace('.','',1).isdigit() and s.count('.') ==1:\n    print("float")\nelse:\n      print("string")\n` },
+                { title: "8. Dynamic Multi-...", code: `# Inputs\nfolder_name = input()\nsubfolder_name = input()\nfile_base_name = input()\ndrive_number = int(input())\nfile_extension = input()\nseparator_type = input()\n\n# Variables\nfull_file_name = file_base_name + file_extension\nforward_sep = "/"\nbackward_sep = "\\\\"\n\n# Drive mapping variables\ndrive3 = 'D'\ndrive4 = 'F'\ndrive5 = 'H'\ndrive6 = 'J'\ndrive7 = 'L'\ndrive8 = 'N'\ndrive9 = 'P'\ndrive10 = 'R'\n\n# Mapping drive number to letter using only variables\ndrive_letter = (drive_number == 3) * drive3 + (drive_number == 4) * drive4 + (drive_number == 5) * drive5 + (drive_number == 6) * drive6 + (drive_number == 7) * drive7 + (drive_number == 8) * drive8 + (drive_number == 9) * drive9 + (drive_number == 10) * drive10\n\n# Building paths\nlinux_path = forward_sep + folder_name + forward_sep + subfolder_name + forward_sep + full_file_name\nwindows_path = drive_letter + ":\\\\" + folder_name + "\\\\" + subfolder_name + "\\\\" + full_file_name\n\n# Choosing path\nfinal_path = (separator_type == "forward") * linux_path + (separator_type == "backward") * windows_path\nprint(final_path)\n` },
+
+                // SUB-SECTION 3
+                { isHeader: true, title: "Type Casting" },
+                { title: "1. Simple Interest", code: `P=int(input())\nR=int(input())\nT=int(input())\nSI=P*R*T/100\nprint(SI)\n` },
+                { title: "2. Sum of Cubes", code: `n = int(input())\nsum_of_cubes = 0\nfor i in range(1, n + 1):\n    sum_of_cubes += i ** 3\nprint(sum_of_cubes)` },
+                { title: "3. Integer to Float", code: `a= int(input())\nprint(float(a))` },
+                { title: "4. Sum of Digits of ...", code: `num = int(input())\ndigit_sum = sum(int(digit) for digit in str(num))\nprint(digit_sum)` },
+                { title: "5. String to Integer", code: `s = input().strip('"')\nprint(int(s))` },
+                { title: "6. Cast and Compare", code: `str_int = input()\nf_num = float(input())\nstr_float = input()\nnum1 = float(str_int)\nnum2 = f_num\nnum3 = float(str_float)\nmax_val = max(num1, num2, num3)\nprint(f"{max_val:.2f}")` },
+                { title: "7. Cast for Division", code: `a, b = map(int, input().split())\nint_div = a // b\nfloat_div = a / b\nprint(int_div)\nprint(f"{float_div:.2f}")` },
+                { title: "8. Conversions", code: `parts = input().split()\nstr_float = parts[0].strip('"')\nfloat_num = float(parts[1])\nint_num = int(parts[2])\nfloat_from_str = float(str_float)\nint_from_float = int(float_num)\nstr_from_int = str(int_num)\nprint(float_from_str)\nprint(int_from_float)\nprint('"' + str_from_int + '"')` },
+
+                // SUB-SECTION 4
+                { isHeader: true, title: "Operators" },
+                { title: "1. Assigning values...", code: `a= int(input())\nb=float(input())\nc=input()\nprint(a)\nprint(b)\nprint(c)\n` },
+                { title: "2. Comparison...", code: `n=int(input())\nm=int(input())\nif n==m:\n  print("true")\nelse:\n    print("false")\n    \nif n!=m:\n  print("true")\nelse:\n    print("false")\n    \nif n>m:\n  print("true")\nelse:\n    print("false")\n    \nif n<m:\n  print("true")\nelse:\n    print("false")\n    \nif n>=m:\n  print("true")\nelse:\n    print("false")\n    \nif n<=m:\n  print("true")\nelse:\n    print("false")` },
+                { title: "3. Two Numbers fo...", code: `x = int(input())\ny = int(input())\nprint(x == y)` },
+                { title: "4. Logical operations", code: `n=int(input())\nm=int(input())\nif n and m:\n  print("true")\nelse:\n    print("false")\n    \nif n or m:\n  print("true")\nelse:\n    print("false")\n    \nif not n:\n  print("true")\nelse:\n    print("false")\n    \nif not m:\n  print("true")\nelse:\n    print("false")#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Operator...", code: `expression = input()\nprint(eval(expression))` },
+                { title: "6. Login Validator", code: `username = eval(input())\npassword = eval(input())\nprint(username and password)\nprint(not (username and password))` },
+                { title: "7. Find the Special...", code: `a, b, c, d, e = map(int, input().split())\n\n# Case 1\nif  e - c == 0:\n     print("INVALID")\nelif  (a + b) > (c - d):\n     score = a*(b+c)-d//e\n     print(score)\nelse:\n     score = (a + d) // (e - c) + b * e\n     print(score)` },
+                { title: "8. Operations of...", code: `a = int(input())\nb = int(input())\nexpr = input()\n\na = (a > b) * (a + b) + (a == b) * (a - b) + (a < b) * (a * b)\nprint(a > 0 and (a > b or (a == b and b % 2 == 0)) and a or "Invalid")\n` },
+
+                // SUB-SECTION 5
+                { isHeader: true, title: "Bitwise & Module Tests" },
+                { title: "1. Bitwise Number...", code: `a, b = map(int, input().split())\nva = a^(a&1)\nvb = b^(b&1)\n\nif va == vb:\n    print("Equal")\nelif va > vb:\n    print("A")\nelse:\n    print("B")` },
+                { title: "2. Type Cast...", code: `s1 = input()\ns2 = input()\ns3 = input()\ns4 = input()\n\nval1 = int(s1)\nval2 = float(s2)\n\nres = val1 * val2\n\nif bool(s3):\n    res += 5.5\nelse:\n    res -= 3.3\n\nval4 = int(s4)\nint_part = int(res)\n\nxor_val = int_part ^ val4\ndecimal_part = res - int_part\n\nfinal_result = xor_val + decimal_part\nprint(final_result)` },
+                { title: "3. Bitwise Palindro...", code: `n = int(input())\nc = bin(n).count('1')\nres = n ^ c\nb = bin(res)[2:]\n\nif b == b[::-1]:\n    print("yes")\nelse:\n    print("No")` }
+            ],
+            
+            // Other Modules (Add sub-headers here too if needed!)
+            "module-2-list": [
+                { isHeader: true, title: "Conditional Statements" },
+                { title: "1. If Statement", code: `a = int(input())\nif a>=0:\n  print("The number is positive.")\n` },
+                { title: "2. Check Divisibility...", code: `a=int(input())\nif a%5==0:\n  print("Divisible by 5")\nelse:\n  print("Not Divisible by 5")` },
+                { title: "3. If-else statement", code: `a=int(input())\nif a%2==0:\n  print("The number is even.")\nelse:\n  print("The number is odd.")` },
+                { title: "4. If-elif statement.", code: `a=int(input())\nif a>0:\n  print("The number is positive.")\nelif a<0:\n  print("The number is negative.")\nelse:\n  print("The number is zero.")` },
+                { title: "5. Traffic Light...", code: `a=input() \nif a=="Red":\n  print("Stop")\nelif a=="Yellow":\n  print("Ready")\nelif a==("Green"):\n  print("Go")\nelse:\n  print("invalid color")` },
+                { title: "6. Age Group...", code: `age = int(input())\n\nif age < 13:\n    print("Child")\nelif age <= 19:\n    print("Teenager")\nelif age <= 64:\n    print("Adult")\nelse:\n    print("Senior")` },
+                { title: "7. Number...", code: `age = int(input())\n\nif age < 13:\n    print("Child")\nelif age <= 19:\n    print("Teenager")\nelif age <= 64:\n    print("Adult")\nelse:\n    print("Senior")` },
+                { title: "8. Digital Locker...", code: `security_clearance, biometric_score, access_code = map(int, input().split())\n\n# Check clearance level requirement\nclearance_ok = False\nif biometric_score > 85:\n    clearance_ok = security_clearance >= 5\nelif 60 <= biometric_score <= 85:\n    clearance_ok = security_clearance >= 7\nelse:  # biometric_score < 60\n    clearance_ok = security_clearance == 10\n\n# Check access code requirements\ncode_str = str(access_code)\ncode_even = access_code % 2 == 0\ndigit_sum = sum(int(d) for d in code_str)\ndigit_sum_ok = digit_sum % 5 == 0\n\n# Grant access if all conditions are met\nif clearance_ok and code_even and digit_sum_ok:\n    print("Access Granted")\nelse:\n    print("Access Denied")` },
+
+                { isHeader: true, title: "Loops: for" },
+                { title: "1. Even Numbers...", code: `n = int(input())\nfor i in range(2, n+1, 2):\n    print(i)` },
+                { title: "2. User-Defined...", code: `n = int(input())\nm = int(input())\nfor _ in range(m):\n    print(n)` },
+                { title: "3. Number Printer", code: `n = int(input())\nfor i in range(1, n+1):\n    print(i)` },
+                { title: "4. Odd Number...", code: `n = int(input())\nfor i in range(1, n+1, 2):\n    print(i)` },
+                { title: "5. Print numbers", code: `n = int(input())\nfor i in range(1, n+1):\n    print(' '.join(map(str, range(1, i+1))))` },
+                { title: "6. Sum of Squares", code: `n = int(input())\nprint(sum(i**2 for i in range(1, n+1)))` },
+                { title: "7. Reverse a...", code: `n = int(input())\nnums = list(map(int, input().split()))\nprint(' '.join(map(str, reversed(nums))))` },
+                { title: "8. Sum of Powers o...", code: `n = int(input())\nresult = 0\nd = 2\nwhile d * d <= n:\n    power = 0\n    while n % d == 0:\n        power += 1\n        n //= d\n    if power > 0:\n        result += d ** power\n    d += 1\nif n > 1:\n    result += n\nprint(result)` },
+
+                { isHeader: true, title: "Loops: while" },
+                { title: "1. Reverse order", code: `n = int(input())\nfor i in range(n,0,-1):\n  print(i , end = ' ')` },
+                { title: "2. Print 1 to N", code: `n = int(input())\nfor i in range(1,n+1,1):\n  print(i)` },
+                { title: "3. Hello Printer", code: `N = int(input())\ncount = 0 \nwhile count<N:\n  print("Hello")\n  count+=1` },
+                { title: "4. Even Printer", code: `n = int(input())\nfor n in range(2,n+1,2):\n  print(n)` },
+                { title: "5. Sum of first N...", code: `n = int(input())\ntotal = 0\ncounter = 1\nwhile counter <=n:\n  total += counter\n  counter +=1\nprint(total)\n` },
+                { title: "6. Factorial...", code: `n = int(input())\nfactorial = 1\ncounter = 1\nif n<0 :\n    print("Error: Factorial is not defined for negative numbers")\nelse:\n    while counter <=n:\n        factorial *= counter\n        counter +=1\n    print(factorial)` },
+                { title: "7. Sum of Digits", code: `n = int(input())\nif n<0:\n    print("Error: Sum of digits is not defined for negative numbers.")\nelse:\n    digit_sum = 0\n    while n>0:\n        digit_sum += n%10\n        n = n//10\n    print(digit_sum)` },
+                { title: "8. Find the Largest...", code: `n = int(input())\nif n==1:\n    print(1)\nelse:\n    largest_prime = -1\n    while n%2==0:\n        largest_prime = 2\n        n = n//2\n    \n    i = 3\n    while i*i<=n:\n        while n%i==0:\n            largest_prime = i\n            n = n//i\n        i += 2\n    \n    if n>2:\n        largest_prime = n\n    \n    print(largest_prime)` },
+
+                { isHeader: true, title: "Nested loops" },
+                { title: "1. Outer and Inner...", code: `n=int(input())\nm=int(input())\n\nfor i in range(n):\n  for j in range(m):\n    print(f"Outer: {i}, Inner: {j}")\n` },
+                { title: "2. Pyramid Pattern...", code: `# Read number of rows\nn = int(input())\n\nfor i in range(1, n + 1):\n    # Print leading spaces\n    print(" " * (n - i), end="")\n    # Print numbers from 1 to i\n    for j in range(1, i + 1):\n        print(j, end=" ")\n    print()\n` },
+                { title: "3. Print a Number...", code: `rows = int(input())\ncols = int(input())\nfor i in range(rows):\n    for j in range(1, cols + 1):\n        print(j, end=' ')\n    print()` },
+                { title: "4. Star Rectangle...", code: `n, m = map(int, input().split())\nfor i in range(n):\n    for j in range(m):\n        print('*', end='')\n    print()` },
+                { title: "5. Print a Square...", code: `n = int(input())\nfor i in range(n):\n    for j in range(n):\n        print('*', end='')\n    print()` },
+                { title: "6. Multiplication...", code: `n = int(input())\nfor i in range(1, n + 1):\n    for j in range(1, n + 1):\n        print(i * j, end=' ')\n    print()` },
+                { title: "7. Diagonal Zig-Za...", code: `n = int(input())\ngrid = []\nfor i in range(n):\n    row = []\n    for j in range(n):\n        row.append(i * n + j + 1)\n    grid.append(row)\n\ntotal_sum = 0\nfor diag_idx in range(2 * n - 1):\n    elements = []\n    for i in range(n):\n        for j in range(n):\n            if i + j == diag_idx:\n                elements.append(grid[i][j])\n    \n    if diag_idx % 2 == 0:\n        elements.reverse()\n    \n    for elem in elements:\n        total_sum += elem\n\nprint(total_sum)` },
+                { title: "8. Matrix Spiral...", code: `n = int(input())\nmatrix = []\nfor i in range(n):\n    row = list(map(int, input().split()))\n    matrix.append(row)\n\nresult = []\ntop, bottom, left, right = 0, n - 1, 0, n - 1\n\nwhile top <= bottom and left <= right:\n    col = left\n    while col <= right:\n        result.append(matrix[top][col])\n        col += 1\n    top += 1\n    \n    row = top\n    while row <= bottom:\n        result.append(matrix[row][right])\n        row += 1\n    right -= 1\n    \n    if top <= bottom:\n        col = right\n        while col >= left:\n            result.append(matrix[bottom][col])\n            col -= 1\n        bottom -= 1\n    \n    if left <= right:\n        row = bottom\n        while row >= top:\n            result.append(matrix[row][left])\n            row -= 1\n        left += 1\n\nprint(' '.join(map(str, result)))` },
+
+                { isHeader: true, title: "Control Statements: break, continue, pass" },
+                { title: "1. Searching for a...", code: `numbers = list(map(int, input().split()))\ntarget = int(input())\nfound = False\nfor i in range(len(numbers)):\n    if numbers[i] == target:\n        print(f"Number found at index {i}")\n        found = True\n        break\nif not found:\n    print("Number not found")` },
+                { title: "2. Skipping Even...", code: `n = int(input())\nfor i in range(1, n + 1):\n    if i % 2 == 0:\n        continue\n    print(i, end=' ')\nprint()` },
+                { title: "3. Pass Statement", code: `n = int(input())\nm = int(input())\nfor i in range(n, m + 1):\n    if i == 3:\n        print("Skip 3!")\n    else:\n        print(i)` },
+                { title: "4. Skip the Number...", code: `n, m = map(int, input().split())\nfor i in range(n, m + 1):\n    if i == 3:\n        print("Skipping number 3!")\n        pass\n    else:\n        print(i)` },
+                { title: "5. Limiting Loops", code: `n = int(input())\nfor i in range(1, n + 1):\n    if i > 10:\n        break\n    if i % 2 == 0:\n        continue\n    print(i, end=' ')\nprint()` },
+                { title: "6. Skip Even...", code: `n = int(input())\ntotal = 0\nfor i in range(1, n + 1):\n    if i % 2 == 0:\n        continue\n    total += i\nprint(total)` },
+                { title: "7. Count Positive...", code: `count = 0\nwhile True:\n    num = int(input())\n    if num == 0:\n        break\n    if num <= 0:\n        pass\n    else:\n        count += 1\nprint(count)` },
+                { title: "8. Escape the Infini...", code: `n, k = map(int, input().split())\ni = 0\nwhile i < n:\n    cmd = input().strip()\n    if cmd == "MOVE":\n        i += 1\n        continue\n    elif cmd == "JUMP":\n        i += 1 + k\n        continue\n    elif cmd == "BLOCK":\n        print("TRAPPED")\n        break\n    elif cmd == "IGNORE":\n        i += 1\n        pass\n    elif cmd == "END":\n        print("ESCAPED")\n        break\nelse:\n    print("ESCAPED")` },
+
+                { title:"Module test", code :'khud se krlo kuch to :)' }
+            ],
+            "module-3-list": [
+                { isHeader: true, title: "List and its operations" },
+                { title: "1. Largest Number ...", code: `# Read input from user
+numbers = list(map(int, input().split()))
+
+# Find and print the largest number
+print(max(numbers))` },
+                { title: "2. Access Element ...", code: `# Read input
+numbers = list(map(int, input().split()))
+index = int(input())
+
+# Print element at the specified index
+print(numbers[index])` },
+                { title: "3. Slice Between T...", code: `# Read input
+numbers = list(map(int, input().split()))
+start, end = map(int, input().split())
+
+# Print the sliced list
+sliced_list = numbers[start:end]
+print(' '.join(map(str, sliced_list)))` },
+                { title: "4. Methods in list", code: `# Read number of elements
+n = int(input())
+
+# Read the elements
+my_list = []
+for _ in range(n):
+    element = input()
+    my_list.append(element)
+
+# Read the element to remove
+element_to_remove = input()
+
+# Remove the element if found
+if element_to_remove in my_list:
+    my_list.remove(element_to_remove)
+else:
+    print("not found")
+
+# Apply list methods: sort and reverse (to match sample: descending)
+my_list.sort()
+my_list.reverse()
+
+# Print the modified list
+print(my_list)
+` },
+                { title: "5. Update an...", code: `# Read input
+numbers = list(map(int, input().split()))
+position = int(input())
+new_value = int(input())
+
+# Update the element at the given position
+numbers[position] = new_value
+
+# Print the updated list
+print(' '.join(map(str, numbers)))` },
+                { title: "6. Monthly...", code: `# Read temperatures
+temperatures = list(map(int, input().split()))
+
+# Find days with temperature drop of 5 or more
+anomaly_days = []
+for i in range(1, len(temperatures)):
+    if temperatures[i-1] - temperatures[i] >= 5:
+        anomaly_days.append(temperatures[i])
+
+# Print the result
+print(anomaly_days)` },
+                { title: "7. Detecting Local...", code: `# Read stock prices
+prices = list(map(int, input().split()))
+
+# Find local peaks
+peaks = []
+for i in range(1, len(prices) - 1):
+    if prices[i] > prices[i-1] and prices[i] > prices[i+1]:
+        peaks.append(i)
+
+# Print the result
+print(peaks)` },
+                { title: "8. Sensor Drift...", code: `def is_prime(n):
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    for i in range(3, int(n**0.5) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+n = int(input())
+readings = list(map(int, input().split()))
+original_length = len(readings)
+
+# Step 1: Remove consecutive duplicates
+cleaned = []
+for i in range(len(readings)):
+    if i == 0 or readings[i] != readings[i-1]:
+        cleaned.append(readings[i])
+
+# Step 2: Extract values at prime indices and track their original positions
+prime_indices = []
+prime_values = []
+for i in range(len(cleaned)):
+    if is_prime(i):
+        prime_indices.append(i)
+        prime_values.append(cleaned[i])
+
+# Step 3: Replace negative numbers with average of non-negative neighbors
+for j in range(len(prime_values)):
+    if prime_values[j] < 0:
+        neighbors = []
+        # Check left neighbor in prime_values
+        if j > 0 and prime_values[j-1] >= 0:
+            neighbors.append(prime_values[j-1])
+        # Check right neighbor in prime_values
+        if j < len(prime_values) - 1 and prime_values[j+1] >= 0:
+            neighbors.append(prime_values[j+1])
+        if neighbors:
+            prime_values[j] = sum(neighbors) // len(neighbors)
+        else:
+            prime_values[j] = 0
+
+# Step 4: Multiply elements at even indices by original length
+for i in range(0, len(prime_values), 2):
+    prime_values[i] *= original_length
+
+# Step 5: Reverse the list
+prime_values.reverse()
+
+# Step 6: Check if first == last
+if prime_values[0] == prime_values[-1]:
+    print(prime_values)
+else:
+    print("Corrupted Signal")` },
+
+                { isHeader: true, title: "Tuples" },
+                { title: "1. Creating a Tuple", code: `# Read input and create tuple
+values = input().split()
+tuple_result = tuple(values)
+
+# Print the tuple
+print(tuple_result)` },
+                { title: "2. Accessing tuples", code: `values = input().split()
+my_tuple = tuple(values)
+index = int(input())
+print(my_tuple[index])` },
+                { title: "3. Concatenation o...", code: `tuple1 = tuple(input().split())
+tuple2 = tuple(input().split())
+result = tuple1 + tuple2
+print(result)` },
+                { title: "4. Slicing", code: `my_tuple = tuple(input().split())
+start = int(input())
+stop = int(input())
+sliced = my_tuple[start:stop]
+print(sliced)` },
+                { title: "5. Add an Element ...", code: `my_tuple = tuple(map(int, input().split()))
+element = int(input())
+my_list = list(my_tuple)
+my_list.append(element)
+result = tuple(my_list)
+print(result)` },
+                { title: "6. Login Analyzer", code: `login_times = tuple(map(int, input().split()))
+office_hours = tuple(time for time in login_times if 9 <= time <= 17)
+print(office_hours)` },
+                { title: "7. Heatwave...", code: `temperatures = tuple(map(int, input().split()))
+heatwaves = []
+for i in range(len(temperatures) - 2):
+    window = (temperatures[i], temperatures[i+1], temperatures[i+2])
+    if all(temp > 35 for temp in window):
+        heatwaves.append(window)
+print(tuple(heatwaves))` },
+                { title: "8. Prime Index Tupl...", code: `def is_prime(n):
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    for i in range(3, int(n**0.5) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+n = int(input())
+elements = tuple(map(int, input().split()))
+
+prime_elements = tuple(elements[i] for i in range(len(elements)) if is_prime(i))
+unique_elements = tuple(dict.fromkeys(prime_elements))
+unique_sum = sum(unique_elements)
+
+sliced_elements = elements[::3]
+sliced_sum = sum(sliced_elements)
+
+if unique_sum > sliced_sum:
+    print("Pattern Matched")
+else:
+    print("Pattern Mismatch")` },
+
+                { isHeader: true, title: "Sets and its operations" },
+                { title: "1. Creating sets", code: `elements = sorted(set(input().split()))
+print('{' + ', '.join(elements) + '}')` },
+                { title: "2. Set Operations", code: `set1 = set(input().split())
+set2 = set(input().split())
+union = sorted(set1 | set2)
+intersection = sorted(set1 & set2)
+difference = sorted(set1 - set2)
+print(f"Union: {union}")
+print(f"Intersection: {intersection}")
+print(f"Difference (set1 - set2): {difference}")` },
+                { title: "3. Minimum and...", code: `numbers = set(map(int, input().split()))
+print(min(numbers))
+print(max(numbers))` },
+                { title: "4. Count number o...", code: `words = input().lower()
+vowels = 'aeiou'
+count = sum(1 for char in words if char in vowels)
+print(count)` },
+                { title: "5. Remove Specific...", code: `# input set
+s = set(map(int, input().split()))
+
+# element to remove
+x = int(input())
+
+# remove element if present
+s.discard(x)
+
+# print updated set
+print(s)` },
+                { title: "6. Emergency...", code: `total_teams = set(input().split())
+assigned_teams = set(input().split())
+new_request = set(input().split())
+available_teams = total_teams - assigned_teams
+valid_new = new_request & available_teams
+final_assigned = assigned_teams | valid_new
+print(sorted(final_assigned))` },
+                { title: "7. Email Spam Filter", code: `emails_input = input().split()
+blocked_domains = set(input().split())
+valid_emails = []
+for email in emails_input:
+    domain = email.split('@')[1]
+    if domain not in blocked_domains:
+        valid_emails.append(email)
+print(set(valid_emails))` },
+                { title: "8. Library...", code: `# number of books
+n = int(input())
+
+library = {}
+for _ in range(n):
+    isbn, genre = input().split()
+    library[isbn] = genre
+
+# borrowed books
+borrowed = {"undergraduate": {}, "postgraduate": {}}
+borrowed_genres = {"undergraduate": set(), "postgraduate": set()}
+
+# initial borrow actions
+m = int(input())
+for _ in range(m):
+    status, isbn = input().split()
+    if isbn in library:
+        genre = library.pop(isbn)
+        borrowed[status][isbn] = genre
+        borrowed_genres[status].add(genre)
+        print(f"Book {isbn} borrowed.")
+
+# operations
+k = int(input())
+
+for _ in range(k):
+    parts = input().split()
+    op = parts[0]
+
+    if op == "borrow":
+        status = parts[1]
+        isbn = parts[2]
+
+        if isbn in library:
+            genre = library.pop(isbn)
+            borrowed[status][isbn] = genre
+            borrowed_genres[status].add(genre)
+            print(f"Book {isbn} borrowed.")
+        else:
+            print(f"Book {isbn} not available.")
+
+    elif op == "return":
+        status = parts[1]
+        isbn = parts[2]
+
+        if isbn in borrowed[status]:
+            genre = borrowed[status].pop(isbn)
+            library[isbn] = genre
+            print(f"Book {isbn} returned.")
+        else:
+            print(f"Book {isbn} was not borrowed.")
+
+    elif op == "suggest":
+        status = parts[1]
+        genres = borrowed_genres[status]
+
+        suggestions = {isbn for isbn, g in library.items() if g in genres}
+
+        print(f"Suggested books for {status}: {suggestions}")` },
+
+                { isHeader: true, title: "Dictionaries" },
+                { title: "1. Two lists into a...", code: `keys = input().split()
+values = input().split()
+print(dict(zip(keys, values)))
+` },
+                { title: "2. Value of key...", code: `n = int(input())
+d = {}
+for _ in range(n):
+    k = input().strip()
+    v = input().strip()
+    d[k] = v
+print(d['computers'] if 'computers' in d else "Key 'computers' not found")
+` },
+                { title: "3. Extracting the...", code: `n = int(input())
+d = {}
+for _ in range(n):
+    k = input().strip()
+    v = input().strip()
+    d[k] = v
+keys = input().split()
+new_d = {}
+for k in keys:
+    if k in d:
+        new_d[k] = d[k]
+print(new_d)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "4. Dictionary...", code: `n = int(input())
+d = {}
+for _ in range(n):
+    k = input().strip()
+    v = input().strip()
+    d[k] = v
+get_key = input().strip()
+update_key = input().strip()
+update_val = input().strip()
+pop_key = input().strip()
+print(d.get(get_key, "Key not found"))
+d.update({update_key: update_val})
+d.pop(pop_key, None)
+d_copy = d.copy()
+print(d_copy)
+d.clear()
+print(d)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Print a Dictionar...", code: `n = int(input())
+d = {}
+for _ in range(n):
+    k = input().strip()
+    v = input().strip()
+    d[k] = v
+for k, v in d.items():
+    print(f"The value for {k} is {v}")
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "6. Bookstore...", code: `s = input().split()
+d = {}
+for rec in s:
+    title, count = rec.split(':')
+    d[title] = d.get(title, 0) + int(count)
+print(d)
+` },
+                { title: "7. Student Grading...", code: `names = input().split()
+scores = list(map(int, input().split()))
+d = dict(zip(names, scores))
+d = {k: v for k, v in d.items() if v >= 50}
+print(d)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. Secret Key...", code: `n = int(input())
+d = {}
+for _ in range(n):
+    k, v = input().split()
+    d[k] = int(v)
+d = {k: v for k, v in d.items() if len(k) % 2 == 0 and v > 0}
+new_d = {}
+for k, v in d.items():
+    rk = k[::-1]
+    t = ""
+    for c in rk:
+        if c in "aeiou":
+            t += c.upper()
+        else:
+            t += c
+    if v % 2 == 0:
+        new_d[t] = bin(v)[2:]
+    else:
+        new_d[t] = oct(v)[2:]
+keys = sorted(new_d.keys())
+print(keys[0] + keys[-1])
+#Enhance your coding skills, start writing your code here!!` },
+
+                { isHeader: true, title: "Comprehensions" },
+                { title: "1. Filtering Even...", code: `nums = list(map(int, input().split()))
+evens = [x for x in nums if x % 2 == 0]
+print(evens)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Sum of Squares", code: `n = int(input())
+print(sum(i * i for i in range(1, n + 1)))
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "3. Inverting a...", code: `d = eval(input())
+print({v: k for k, v in d.items()})
+` },
+                { title: "4. Flattening a...", code: `nested_list = eval(input())
+flat_list = [item for sub in nested_list for item in sub]
+print(flat_list)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Nested...", code: `n = int(input())
+res = [(i, j) for i in range(1, n + 1) for j in range(1, n + 1)]
+print(res)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "6. Product Discoun...", code: `names = input().split()
+prices = list(map(float, input().split()))
+
+discounted = {
+    name: round(price * 0.9, 2)
+    for name, price in zip(names, prices)
+    if price > 1000
+}
+
+print(discounted)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. Filter Squared...", code: `nums = list(map(int, input().split()))
+res = [x * x for x in nums if x % 2 == 0 and str(x * x) == str(x * x)[::-1]]
+print(res)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. Smart Toy Batter...", code: `def digit_sum(x):
+    x = abs(x)
+    s = 0
+    while x > 0:
+        s += x % 10
+        x //= 10
+        return s
+
+n = int(input())
+arr = list(map(int, input().split()))
+
+filtered = []
+for x in arr:
+    if x % 3 == 0 or digit_sum(x) % 2 == 0:
+        filtered.append(x)
+
+mp = {}
+for x in filtered:
+    if x % 2 == 0:
+        mp[x] = x * x
+    else:
+        mp[x] = x * x * x
+
+res = []
+for v in mp.values():
+    if v >= 0:
+        r = int(v ** 0.5)
+        if r * r == v:
+            res.append(v)
+
+print(*res)
+#Enhance your coding skills, start writing your code here!!` },
+
+                { isHeader: true, title: "Strings" },
+                { title: "1. Number of...", code: `s = input()
+print(len(s))` },
+                { title: "2. Concatenation", code: `s1 = input().strip()
+s2 = input().strip()
+c = s1 + s2
+print(c)
+print(c[:5])` },
+                { title: "3. Reverse order", code: `s = input().strip()
+print(s[::-1])` },
+                { title: "4. Custom Fill...", code: `s = input().rstrip('\n')
+w = int(input().strip())
+fill = input().strip()
+if fill == "":
+    fill = "#"
+print(s.center(w, fill))
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Character...", code: `s1 = input().rstrip('\n')
+s2 = input().rstrip('\n')
+t = input().rstrip('\n')
+
+table = str.maketrans(s1, s2)
+print(t.translate(table))
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "6. Normalize and...", code: `emails = input().strip().split()
+normalized = [e.strip().lower() for e in emails]
+sorted_emails = sorted(normalized, key=lambda x: x.split("@")[1])
+print(sorted_emails)
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. Normalize and...", code: `import string
+
+text = input().strip().lower()
+for ch in ".,!?;:":
+    text = text.replace(ch, " ")
+words = text.split()
+freq = {}
+for w in words:
+    freq[w] = freq.get(w, 0) + 1
+items = sorted(freq.items(), key=lambda x: (-x[1], x[0]))
+for w, c in items:
+    print(f"{w}:{c}")
+#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. letters and digits", code: `s = input().strip()
+letters = ""
+digits = ""
+for ch in s:
+    if ch.isalpha():
+        letters += ch
+    else:
+        digits += ch
+
+vowels = "aeiouAEIOU"
+trans_letters = ""
+for ch in letters:
+    if ch in vowels:
+        trans_letters += ch.upper()
+    else:
+        trans_letters += ch.lower()
+
+digits_rev = digits[::-1]
+trans_digits = ""
+for d in digits_rev:
+    trans_digits += str(9 - int(d))
+
+i = j = 0
+res = ""
+while i < len(trans_letters) and j < len(trans_digits):
+    res += trans_letters[i]
+    res += trans_digits[j]
+    i += 1
+    j += 1
+if i < len(trans_letters):
+    res += trans_letters[i:]
+if j < len(trans_digits):
+    res += trans_digits[j:]
+print(res)
+` }
+            ],
+            "module-4-list": [
+                { isHeader: true, title: "Functions Arguments basics" },
+                { title: "1. Calling a function", code: `def add_numbers(a, b):\n    return a + b\n\n# Read input\nx = int(input().strip())\ny = int(input().strip())\n\n# Call the function and print result\nprint(add_numbers(x, y))\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Function...", code: `def add_numbers(a, b):\n    return a + b\n\nx = int(input().strip())\ny = int(input().strip())\n\nprint(add_numbers(x, y))\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "3. Variable-Length...", code: `def sum_all(*args):\n    return sum(args)\n\n# Read a line of space-separated integers\nnums = list(map(int, input().strip().split()))\n\n# Call the function with variable-length arguments and print result\nprint(sum_all(*nums))\n` },
+                { title: "4. Single return call", code: `def calculate(a, b):\n    add = a + b\n    sub = a - b\n    return add, sub\n\nx = int(input().strip())\ny = int(input().strip())\n\nsum_result, diff_result = calculate(x, y)\nprint(sum_result)\nprint(diff_result)\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Calculate the...", code: `def calculate_average(a, b, c):\n    return (a + b + c) / 3\n\n# Read three integers (can be space-separated or line-separated)\na, b, c = map(int, input().split())\n\navg = calculate_average(a, b, c)\nprint("{:.2f}".format(avg))\n` },
+                { title: "6. Smart Billing...", code: `def generate_bill(name, items, discount=0):\n    total = sum(items)\n    total_after_discount = total * (1 - discount / 100)\n    return "{:.2f}".format(total_after_discount)\n\nname = input().strip()\nprices_line = input().strip()\n\nitems = list(map(float, prices_line.split()))\n\ndiscount_line = input().strip()\nif discount_line == "":\n    discount = 0\nelse:\n    discount = int(discount_line)\n\nprint(generate_bill(name, items, discount=discount))\n` },
+                { title: "7. Student Grader", code: `def grade_student(name, score, passing_score=40, grade='F'):\n    if score >= passing_score:\n        result = "Passed"\n    else:\n        result = "Failed"\n    return f"{name}: {result} with grade {grade}"\n\n\nname = input().strip()\nscore = int(input().strip())\n\n# Try to read optional third line; if missing, use defaults\ntry:\n    extra = input().strip()\nexcept EOFError:\n    extra = ""\n\nkwargs = {}\n\nif extra:\n    parts = extra.split()\n    for p in parts:\n        key, value = p.split("=")\n        if key == "passing_score":\n            kwargs["passing_score"] = int(value)\n        elif key == "grade":\n            kwargs["grade"] = value\n\nprint(grade_student(name, score, **kwargs))\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. Dynamic Functio...", code: `def dynamic_handler(ops):\n    results = []\n    for op_name, params in ops:\n        nums = params\n        if op_name == "add":\n            results.append(sum(nums))\n        elif op_name == "multiply":\n            prod = 1\n            for x in nums:\n                prod *= x\n            # If no numbers, product should be 0 or 1? Use 0 only if empty.\n            if len(nums) == 0:\n                prod = 0\n            results.append(prod)\n        elif op_name == "find_max":\n            results.append(max(nums))\n        elif op_name == "find_min":\n            results.append(min(nums))\n    return results\n\n\nn = int(input().strip())\noperations = []\n\nfor _ in range(n):\n    parts = input().split()\n    op = parts[0]\n    if len(parts) > 1:\n        nums = list(map(int, parts[1:]))\n    else:\n        nums = []\n    operations.append((op, nums))\n\nfor res in dynamic_handler(operations):\n    print(res)\n#Enhance your coding skills, start writing your code here!!` },
+
+                { isHeader: true, title: "Advanced Function Argument" },
+                { title: "1. Default...", code: `name = input()\ngreeting = input()\nif greeting.strip() == "":\n    greeting = "Hello"\nprint(f"{greeting}, {name}!")` },
+                { title: "2. Keyword...", code: `def describe_pet(name, pet_type="dog"):\n    return f"I have a {pet_type} named {name}."\n\nname = input()\npet_type = input().strip()\nif pet_type == "":\n    pet_type = "dog"\nprint(describe_pet(name, pet_type=pet_type))` },
+                { title: "3. Greet the User", code: `def greet_user(name, greeting="Hello"):\n    return f"{greeting}, {name}!"\n\nline = input().split()\nif len(line) > 2:\n    print("Invalid input format.")\nelif len(line) == 1:\n    print(greet_user(line[0]))\nelse:\n    print(greet_user(line[0], line[1]))` },
+                { title: "4. Add Two Numbe...", code: `def add_numbers(a, b=10):\n    return a + b\n\nnums = input().split()\nif len(nums) == 1:\n    print(add_numbers(int(nums[0])))\nelse:\n    print(add_numbers(int(nums[0]), int(nums[1])))` },
+                { title: "5. Create a Full...", code: `def full_name(first, last, separator=" "):\n    return f"{first}{separator}{last}"\n\nline = input().split()\nif len(line) == 2:\n    print(full_name(line[0], line[1]))\nelse:\n    print(full_name(line[0], line[1], separator=line[2]))` },
+                { title: "6. Merge and...", code: `def merge_and_multiply(a, b, *args):\n    all_nums = [a, b] + list(args)\n    sorted_list = sorted(all_nums, reverse=True)\n    product = 1\n    for num in all_nums:\n        product *= num\n    return (sorted_list, product)\n\nab = list(map(int, input().split()))\nargs_input = input().strip()\nif args_input:\n    args = list(map(int, args_input.split()))\nelse:\n    args = []\nresult = merge_and_multiply(ab[0], ab[1], *args)\nprint(result[0])\nprint(result[1])` },
+                { title: "7. Custom Sum an...", code: `def filter_and_sum(limit, *numbers):\n    total = 0\n    for num in numbers:\n        if num < limit and num % 2 == 0:\n            total += num\n    return total\n\nlimit = int(input())\nnumbers = list(map(int, input().split()))\nprint(filter_and_sum(limit, *numbers))` },
+                { title: "8. Custom Function...", code: `n = int(input())\nparams = []\ndefaults = {}\n\nfor _ in range(n):\n    line = input().strip()\n    if '=' in line:\n        name, default = line.split('=')\n        params.append(name)\n        defaults[name] = default\n    else:\n        params.append(line)\n\nm = int(input())\n\nfor _ in range(m):\n    call = input().strip()\n    args = [x.strip() for x in call.split(',')]\n    \n    values = {}\n    pos_count = 0\n    error = False\n    \n    for arg in args:\n        if '=' in arg:\n            key, val = arg.split('=')\n            if key in values:\n                error = True\n                break\n            if key not in params:\n                error = True\n                break\n            values[key] = val\n        else:\n            if pos_count >= len(params):\n                error = True\n                break\n            param = params[pos_count]\n            if param in values:\n                error = True\n                break\n            values[param] = arg\n            pos_count += 1\n    \n    if not error:\n        for p in params:\n            if p not in values:\n                if p in defaults:\n                    values[p] = defaults[p]\n                else:\n                    error = True\n                    break\n    \n    if error:\n        print("ERROR")\n    else:\n        result = [values[p] for p in params]\n        print(result)` },
+
+                { isHeader: true, title: "Functions" },
+                { title: "1. Packing and...", code: `def pack_and_unpack(*args):\n    print(f"Packed Arguments: {args}")\n    for x in args:\n        print(f"Unpacked: {x}")\n\n# read input\nnums = list(map(int, input().split()))\npack_and_unpack(*nums)\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Generator", code: `def arithmetic_generator(a, b):\n    yield ("Addition:", a + b)\n    yield ("Subtraction:", a - b)\n    yield ("Multiplication:", a * b)\n    yield ("Division:", a // b)\n\na = int(input().strip())\nb = int(input().strip())\n\nfor label, value in arithmetic_generator(a, b):\n    print(f"{label}")\n    print(value)\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "3. Built-in Functions", code: `nums = list(map(int, input().split()))\ndoubled = list(map(lambda x: x * 2, nums))\nprint(doubled)\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "4. Square a Numbe...", code: `square = lambda n: n * n\n\nn = int(input().strip())\nprint(square(n))\n` },
+                { title: "5. Defining and...", code: `def greet(name):\n    print(f"Hello, {name}! Welcome!")\n\nname = input().strip()\ngreet(name)\n` },
+                { title: "6. Filter and...", code: `n = int(input().strip())\nproducts = []\n\nfor _ in range(n):\n    name, price = input().split()\n    price = float(price)\n    products.append((name, price))\n\n# filter products with price >= 1000\nfiltered = list(filter(lambda p: p[1] >= 1000, products))\n\n# apply 15% discount and round to 2 decimals\ndiscounted = list(map(lambda p: (p[0], round(p[1] * 0.85, 2)), filtered))\n\nprint(discounted)\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. User-Defined...", code: `def top_scorers(students: dict) -> list:\n    # find highest score without using built-in max with key\n    highest = None\n    for name in students:\n        score = students[name]\n        if highest is None or score > highest:\n            highest = score\n\n    result = []\n    for name in students:\n        if students[name] == highest:\n            result.append(name)\n\n    result.sort()\n    return result\n\n\nn = int(input().strip())\nstudents = {}\n\nfor _ in range(n):\n    name, score = input().split()\n    score = int(score)\n    students[name] = score\n\nprint(top_scorers(students))\n#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. Dynamic Multi-...", code: `def make_age_filter(min_age):\n    return lambda s: s["age"] > min_age\n\ndef make_score_between_filter(low, high):\n    return lambda s: low <= s["score"] <= high\n\ndef make_city_filter(city):\n    return lambda s: s["city"] == city\n\ndef make_name_starts_with_filter(prefix):\n    return lambda s: s["name"].startswith(prefix)\n\ndef filter_students(data, filters):\n    result = data\n    for f in filters:\n        result = list(filter(f, result))\n    names = sorted([s["name"] for s in result])\n    return names\n\n\nn = int(input().strip())\nstudents = []\nfor _ in range(n):\n    name, age, score, city = input().split()\n    age = int(age)\n    score = int(score)\n    students.append({"name": name, "age": age, "score": score, "city": city})\n\nm = int(input().strip())\nfilter_names = []\nfor _ in range(m):\n    filter_names.append(input().strip())\n\nparams = []\nwhile True:\n    try:\n        line = input().strip()\n        if line == "":\n            continue\n        params.append(line)\n    except EOFError:\n        break\n\nidx = 0\nfilters = []\nfor fname in filter_names:\n    if fname == "age_above":\n        min_age = int(params[idx])\n        idx += 1\n        filters.append(make_age_filter(min_age))\n    elif fname == "score_between":\n        # one line like "60 90"\n        low, high = map(int, params[idx].split())\n        idx += 1\n        filters.append(make_score_between_filter(low, high))\n    elif fname == "city_is":\n        city = params[idx]\n        idx += 1\n        filters.append(make_city_filter(city))\n    elif fname == "name_starts_with":\n        prefix = params[idx]\n        idx += 1\n        filters.append(make_name_starts_with_filter(prefix))\n\nresult = filter_students(students, filters)\nfor name in result:\n    print(name)\n` },
+
+                { isHeader: true, title: "Recursion" },
+                { title: "1. Factorial using...", code: `def fact(n):\n    if n == 0 or n == 1:\n        return 1\n    return n * fact(n - 1)\n\ns = input().strip()\ntry:\n    n = int(s)\n    if 0 <= n <= 20:\n        print(fact(n))\n    else:\n        print("Invalid input")\nexcept:\n    print("Invalid input")` },
+                { title: "2. Print Numbers in...", code: `def print_desc(n):\n    if n == 0:\n        return\n    print(n, end=" ")\n    print_desc(n - 1)\n\nn = int(input().strip())\nprint_desc(n)\n` },
+                { title: "3. Sum of Numbers...", code: `# Take input\nn, m = map(int, input().split())\n\n# Calculate sum from n to m (inclusive)\ntotal = sum(range(n, m + 1))\n\n# Print result\nprint(total)` },
+                { title: "4. Print Even...", code: `def print_even(n):\n    if n < 2:\n        return\n    print_even(n - 1)\n    if n % 2 == 0:\n        print(n)\n\n# Input\nn = int(input())\n\n# Function call\nprint_even(n)` },
+                { title: "5. Find Power of a...", code: `def power(a, b):\n    if b == 0:\n        return 1\n    return a * power(a, b-1)\n\na, b = map(int, input().split())\nprint(power(a, b))#Enhance your coding skills, start writing your code here!!` },
+                { title: "6. Sum of Alternate...", code: `def f(n):\n    if n == 0:\n        return 0\n    return n % 10 + f(n // 100)\n\nn = int(input())def f(n):\n    if n == 0:\n        return 1\n    if n < 0:\n        return 0\n    return f(n-1) + f(n-2) + f(n-3)\n\nn = int(input())\nprint(f(n))#Enhance your coding skills, start writing your code here!!\nprint(f(n))` },
+                { title: "7. Count Ways to...", code: `def f(n):\n    if n == 0:\n        return 1\n    if n < 0:\n        return 0\n    return f(n-1) + f(n-2) + f(n-3)\n\nn = int(input())\nprint(f(n))#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. Recursive Matrix...", code: `def m(A,B,i,j,k,n):\n    if k==n:\n        return 0\n    return A[i][k]*B[k][j] + m(A,B,i,j,k+1,n)\n\ndef f(A,B,i,j,n):\n    if i==n:\n        return\n    if j==n:\n        print()\n        f(A,B,i+1,0,n)\n        return\n    if j==n-1:\n        print(m(A,B,i,j,0,n))\n    else:\n        print(m(A,B,i,j,0,n),end=" ")\n    f(A,B,i,j+1,n)\n\nn=int(input())\nA=[list(map(int,input().split())) for _ in range(n)]\nB=[list(map(int,input().split())) for _ in range(n)]\nf(A,B,0,0,n)` },
+
+                
+                { isHeader: true, title: "Module Test" }
+            ],
+            "module-5-list": [
+                { isHeader: true, title: "Classes and Objects" },
+                { title: "1. Create a Simple...", code: `class Dog:\n    def __init__(self,n,a):\n        self.n=n\n        self.a=a\n    def show(self):\n        print(f"Dog's Name: {self.n}, Age: {self.a}")\n\nn=input()\na=int(input())\nd=Dog(n,a)\nd.show()` },
+                { title: "2. Every instance...", code: `class Car:\n    wheels=4\n    def __init__(self,make,model):\n        self.make=make\n        self.model=model\n\nm1=input()\nmo1=input()\nm2=input()\nmo2=input()\n\nc1=Car(m1,mo1)\nc2=Car(m2,mo2)\n\nprint(c1.make,c1.model,"has",Car.wheels,"wheels.")\nprint(c2.make,c2.model,"has",Car.wheels,"wheels.")#Enhance your coding skills, start writing your code here!!` },
+                { title: "3. Student Class", code: `class Student:\n    def __init__(self,n,m):\n        self.name=n\n        self.marks=m\n\nn,m=input().split()\ns=Student(n,int(m))\n\nprint(s.name)\nprint("Pass" if s.marks>=40 else "Fail")#Enhance your coding skills, start writing your code here!!` },
+                { title: "4. Vault Balance...", code: `class Vault:\n    def __init__(self,n,b):\n        self.n=n\n        self.b=b\n    def deposit(self,a):\n        self.b+=a\n    def withdraw(self,a):\n        self.b-=a\n\nn=input()\nb=int(input())\nd=int(input())\nw=int(input())\n\nv=Vault(n,b)\nv.deposit(d)\nv.withdraw(w)\n\nprint(f"Vault {v.n}: Balance {v.b}")#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Simple Person...", code: `class Person:\n    def __init__(self,n,a):\n        self.n=n\n        self.a=a\n    def show(self):\n        print(f"Name: {self.n}, Age: {self.a}")\n\nn=input()\na=int(input())\np=Person(n,a)\np.show()\n` },
+                { title: "6. Store and Displa...", code: `class Book:\n    pass\n\nt,a,p=input().split()\nb=Book()\nb.title=t\n    b.author=a\nb.price=float(p)\n\nprint(f"Title: {b.title}")\nprint(f"Author: {b.author}")\nprint(f"Price: {b.price:.2f}")#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. Student Grade...", code: `class Student:\n    def __init__(self,n,a,b,c):\n        self.n=n\n        self.a=a\n        self.b=b\n        self.c=c\n    def avg(self):\n        return (self.a+self.b+self.c)//3\n\nn=input()\na=int(input())\nb=int(input())\nc=int(input())\n\ns=Student(n,a,b,c)\navg=s.avg()\n\nprint(f"Student {s.n}: Average {avg} - {'Pass' if avg>=40 else 'Fail'}")` },
+                { title: "8. Course Enrollme...", code: `class Student:\n    def __init__(self,n,i):\n        self.n=n\n        self.i=i\n        self.c=[]\n    def enroll(self,course):\n        self.c.append(course.name)\n        course.s.append(self.i)\n\nclass Course:\n    def __init__(self,n,code):\n        self.name=n\n        self.code=code\n        self.s=[]\n\ns=int(input())\nstudents=[]\nsm={}\nfor _ in range(s):\n    n,i=input().split()\n    i=int(i)\n    st=Student(n,i)\n    students.append(st)\n    sm[i]=st\n\nc=int(input())\ncourses=[]\ncm={}\nfor _ in range(c):\n    n,code=input().split()\n    co=Course(n,code)\n    courses.append(co)\n    cm[code]=co\n\ne=int(input())\nfor _ in range(e):\n    i,code=input().split()\n    sm[int(i)].enroll(cm[code])\n\nfor st in students:\n    print(f"Student: {st.n}, ID: {st.i}, Courses: {st.c}")\n\nfor co in courses:\n    print(f"Course: {co.name}, Code: {co.code}, Enrolled Students: {co.s}")#Enhance your coding skills, start writing your code here!!` },
+
+                { isHeader: true, title: "Attributes and Methods" },
+                { title: "1. Area and...", code: `class Rectangle:\n    def __init__(self,l,w):\n        self.l=l\n        self.w=w\n    def area(self):\n        return self.l*self.w\n    def peri(self):\n        return 2*(self.l+self.w)\n\nl=float(input())\nw=float(input())\nr=Rectangle(l,w)\n\na=r.area()\np=r.peri()\n\nprint(f"Area: {int(a) if a.is_integer() else a}")\nprint(f"Perimeter: {int(p) if p.is_integer() else p}")#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Static Method in...", code: `class MathOperations:\n    @staticmethod\n    def square(x):\n        return x*x\n\nn=int(input())\nprint(MathOperations.square(n))` },
+                { title: "3. Circle...", code: `class Circle:\n    def __init__(self,r):\n        self.r=r\n    def area(self):\n        return 3.14*self.r*self.r\n    def circ(self):\n        return 2*3.14*self.r\n\nr=float(input())\nc=Circle(r)\n\nprint(f"Area: {c.area():.2f}")\nprint(f"Circumference: {c.circ():.2f}")` },
+                { title: "4. Circle Area...", code: `class Circle:\n    def __init__(self,r):\n        self.r=r\n    def area(self):\n        return 3.14*self.r*self.r\n\nr=float(input())\na=Circle(r).area()\na=round(a,2)\nif a==int(a):\n    a=float(int(a))\nprint(a)` },
+                { title: "5. Book Informatio...", code: `class Book:\n    def __init__(self,t,a):\n        self.t=t\n        self.a=a\n    def print_info(self):\n        print(f"Title: {self.t}")\n        print(f"Author: {self.a}")\n\nt=input()\na=input()\nb=Book(t,a)\nb.print_info()` },
+                { title: "6. Product Inventor...", code: `class Product:\n    def __init__(self,n,p):\n        self.n=n\n        self.p=p\n    def apply_discount(self,d):\n        self.p=self.p-(self.p*d/100)\n    def display_product(self):\n        print(f"{self.n} {self.p:.2f}")\n\nn=input()\np=float(input())\nd=int(input())\n\nx=Product(n,p)\nx.apply_discount(d)\nx.display_product()#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. Bank Account...", code: `class BankAccount:\n    def __init__(self,n):\n        self.n=n\n        self.b=0.0\n    def deposit(self,a):\n        self.b+=a\n    def withdraw(self,a):\n        if a>self.b:\n            print("Insufficient Balance")\n        else:\n            self.b-=a\n    def display(self):\n        print(self.b)\n\nn=input()\nd,w=map(int,input().split())\n\nx=BankAccount(n)\nx.deposit(d)\nx.withdraw(w)\nx.display()#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. Design to model...", code: `class Shape:\n    def __init__(self,t,s):\n        self.t=t\n        self.s=s\n    def resize(self,f):\n        self.s*=f\n    def morph(self,n):\n        self.t=n\n    def combine(self,o):\n        return Shape(self.t+"-"+o.t,self.s+o.s)\n\nn=int(input())\nsh=[]\nfor _ in range(n):\n    t,s=input().split()\n    sh.append(Shape(t,int(s)))\n\nm1=int(input())\nfor _ in range(m1):\n    i,f=map(int,input().split())\n    sh[i-1].resize(f)\n\nm2=int(input())\nfor _ in range(m2):\n    i,t=input().split()\n    sh[int(i)-1].morph(t)\n\nm3=int(input())\nfor _ in range(m3):\n    a,b=map(int,input().split())\n    sh.append(sh[a-1].combine(sh[b-1]))\n\nfor x in sh:\n    print(f"Shape: {x.t}, Size: {x.s}")#Enhance your coding skills, start writing your code here!!` },
+
+                { isHeader: true, title: "Encapsulation" },
+                { title: "1. Encapsulation", code: `class BankAccount:\n    def __init__(self,b):\n        self.__b=b\n    def deposit(self,a):\n        self.__b+=a\n    def withdraw(self,a):\n        self.__b-=a\n    def balance(self):\n        return self.__b\n\nb=float(input())\nd=float(input())\nw=float(input())\n\nx=BankAccount(b)\nx.deposit(d)\nx.withdraw(w)\nprint(x.balance())#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Private Attribute...", code: `class BankAccount:\n    def __init__(self,b):\n        self.__b=b\n    def deposit(self,a):\n        if a>0:\n            self.__b+=a\n            print(f"Deposit Successful: {self.__b}")\n        else:\n            print("Deposit Failed")\n    def withdraw(self,a):\n        if a<=self.__b:\n            self.__b-=a\n            print(f"Withdrawal Successful: {self.__b}")\n\nb=int(input())\nd=int(input())\nw=int(input())\n\nx=BankAccount(b)\nx.deposit(d)\nx.withdraw(w)#Enhance your coding skills, start writing your code here!!` },
+                { title: "3. Encapsulation...", code: `class Student:\n    def __init__(self):\n        self.__g=0\n    def set_grade(self,g):\n        if 0<=g<=100:\n            self.__g=g\n            print(f"Grade set to: {self.__g}")\n        else:\n            print("Grade must be between 0 and 100.")\n    def get_grade(self):\n        return self.__g\n\ng=int(input())\ns=Student()\ns.set_grade(g)#Enhance your coding skills, start writing your code here!!` },
+                { title: "4. Create a Bank...", code: `class BankAccount:\n    def __init__(self):\n        self.__b=0\n    def deposit(self,a):\n        if a>0:\n            self.__b+=a\n            print(f"Balance after deposit: {self.__b}")\n    def withdraw(self,a):\n        if a<=self.__b:\n            self.__b-=a\n            print(f"Balance after withdrawal: {self.__b}")\n        else:\n            print("Withdrawal failed: Insufficient funds")\n\nd=int(input())\nw=int(input())\n\nx=BankAccount()\nx.deposit(d)\nx.withdraw(w)#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Create a Student...", code: `class Student:\n    def __init__(self):\n        self.__name=""\n        self.__age=0\n    def set_name(self,n):\n        self.__name=n\n    def set_age(self,a):\n        if 5<=a<=100:\n            self.__age=a\n        else:\n            print("Invalid age. Age must be between 5 and 100.")\n    def show(self):\n        print(f"Student Name: {self.__name}, Age: {self.__age}")\n\nn=input()\na=int(input())\n\ns=Student()\ns.set_name(n)\ns.set_age(a)\ns.show()#Enhance your coding skills, start writing your code here!!` },
+                { title: "6. Warehouse...", code: `class InventoryItem:\n    def __init__(self, item_name):\n        self.__item_name = item_name\n        self.__stock = 0\n\n    def restock(self, quantity):\n        if quantity > 0:\n            self.__stock += quantity\n\n    def sell(self, quantity):\n        if quantity <= self.__stock:\n            self.__stock -= quantity\n            return self.__stock\n        else:\n            return "Insufficient stock"\n\n    def get_stock(self):\n        return self.__stock\n\n    def get_item_name(self):\n        return self.__item_name\n\n\nitem_name = input()\nn = int(input())\n\nitem = InventoryItem(item_name)\n\nfor _ in range(n):\n    operation = input().split()\n    action = operation[0]\n    quantity = int(operation[1])\n\n    if action == "restock":\n        item.restock(quantity)\n    elif action == "sell":\n        result = item.sell(quantity)\n        print(result)#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. Student Data...", code: `class Student:\n    def __init__(self, name):\n        self.__name = name\n        self.__marks = None\n\n    def set_marks(self, marks):\n        if 0 <= marks <= 100:\n            self.__marks = marks\n            return True\n        return False\n\n    def get_marks(self):\n        return self.__marks\n\n    def display_info(self):\n        print(self.__name)\n        print(self.__marks)\n\nname = input().strip()\nmarks = int(input().strip())\n\ns = Student(name)\n\nif s.set_marks(marks):\n    s.display_info()\nelse:\n    print("Invalid Marks")` },
+                { title: "8. Bank Vaults", code: `class Vault:\n    def __init__(self, vault_id, balance):\n        self.__vault_id = vault_id\n        self.__balance = balance\n\n    def deposit(self, amount):\n        if amount > 0:\n            self.__balance += amount\n\n    def withdraw(self, amount):\n        if amount <= self.__balance:\n            self.__balance -= amount\n\n    def display_vault(self):\n        return f"Vault {self.__vault_id}: Balance {self.__balance}"\n\n\nn = int(input().strip())\nvaults = []\n\nfor _ in range(n):\n    vid, bal = input().split()\n    vaults.append(Vault(vid, int(bal)))\n\nq = int(input().strip())\n\nfor _ in range(q):\n    parts = input().split()\n    operation = parts[0]\n    index = int(parts[1]) - 1\n    amount = int(parts[2])\n\n    if operation == "deposit":\n        vaults[index].deposit(amount)\n    elif operation == "withdraw":\n        vaults[index].withdraw(amount)\n\nfor v in vaults:\n    print(v.display_vault())#Enhance your coding skills, start writing your code here!!` },
+
+                { isHeader: true, title: "Inheritance" },
+                { title: "1. Person and...", code: `class Person:\n    def __init__(self, name):\n        self.name = name\n\n\nclass Student(Person):\n    def introduce(self):\n        print(self.name, "I am a student")\n\n\nname = input().strip()\n\nstudent = Student(name)\nstudent.introduce()#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Smart Device...", code: `class Display:\n    def show_display(self):\n        print("Display: Touchscreen")\n\n\nclass Battery:\n    def show_battery(self):\n        print("Battery: 4000mAh")\n\n\nclass Smartphone(Display, Battery):\n    def show_device(self):\n        print("Device: Smartphone")\n\n\nchoice = input().strip().lower()\n\nphone = Smartphone()\n\nif choice == "display":\n    phone.show_display()\nelif choice == "battery":\n    phone.show_battery()\nelif choice == "smartphone":\n    phone.show_device()\nelse:\n    print("Invalid input")` },
+                { title: "3. Multi-Level...", code: `class Person:\n    def show_name(self):\n        print("I am a person")\n\n\nclass Employee(Person):\n    def show_role(self):\n        print("I am an employee")\n\n\nclass Manager(Employee):\n    def show_department(self):\n        print("I manage a department")\n\n\nchoice = input().strip().lower()\n\nobj = Manager()\n\nif choice == "person":\n    obj.show_name()\nelif choice == "employee":\n    obj.show_name()\n    obj.show_role()\nelif choice == "manager":\n    obj.show_name()\n    obj.show_role()\n    obj.show_department()#Enhance your coding skills, start writing your code here!!` },
+                { title: "4. Hierarchical...", code: `class Animal:\n    def speak(self):\n        print("I am an animal")\n\nclass Dog(Animal):\n    def speak(self):\n        print("I am a dog")\n\nclass Cat(Animal):\n    def speak(self):\n        print("I am a cat")\n\na = input().strip().lower()\n\nif a == "dog":\n    d = Dog()\n    d.speak()\nelif a == "cat":\n    c = Cat()\n    c.speak()\nelse:\n    print("Invalid Input")#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Hybrid Inheritance", code: `a, b = map(int, input().split())\nprint(a + b)` },
+                { title: "6. School Roles", code: `class Person:\n    def __init__(self, name):\n        self.name = name\n\n    def get_name(self):\n        return self.name\n\n\nclass Staff(Person):\n    def __init__(self, name, department):\n        super().__init__(name)\n        self.department = department\n\n    def get_department(self):\n        return self.department\n\n\nclass Teacher(Staff):\n    def __init__(self, name, department, subject):\n        super().__init__(name, department)\n        self.subject = subject\n\n    def get_details(self):\n        return f"{self.get_name()} teaches {self.subject} in {self.get_department()}"\n\n\nclass Admin(Staff):\n    def __init__(self, name, department):\n        super().__init__(name, department)\n\n    def get_role(self):\n        return f"Admin - {self.get_name()} from {self.get_department()}"\n\n\nrole = input().strip()\n\nif role == "Teacher":\n    name = input().strip()\n    department = input().strip()\n    subject = input().strip()\n    t = Teacher(name, department, subject)\n    print(t.get_details())\n\nelif role == "Admin":\n    name = input().strip()\n    department = input().strip()\n    a = Admin(name, department)\n    print(a.get_role())#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. Device...", code: `class WiFiEnabled:\n    def wifi_status(self):\n        return "WiFi On"\n\nclass BluetoothEnabled:\n    def bluetooth_status(self):\n        return "Bluetooth On"\n\nclass SmartDevice(WiFiEnabled, BluetoothEnabled):\n    pass\n\nclass SmartSpeaker(SmartDevice):\n    def __init__(self, model_name):\n        self.model_name = model_name\n\n    def get_status(self):\n        return f"{self.model_name}: {self.wifi_status()}, {self.bluetooth_status()}"\n\nmodel = input().strip()\ns = SmartSpeaker(model)\nprint(s.get_status())#Enhance your coding skills, start writing your code here!!` },
+                { title: "8. Organization...", code: `class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\n    def show_person(self):\n        print(f"Name: {self.name}")\n        print(f"Age: {self.age}")\n\n\nclass Employee(Person):\n    def __init__(self, name, age, employee_id):\n        super().__init__(name, age)\n        self.employee_id = employee_id\n\n    def show_employee(self):\n        print(f"Employee ID: {self.employee_id}")\n\n\nclass Manager(Employee):\n    def __init__(self, name, age, employee_id, team_size):\n        super().__init__(name, age, employee_id)\n        self.team_size = team_size\n\n    def show_manager(self):\n        print(f"Team Size: {self.team_size}")\n\n\nclass Trainer(Person):\n    def __init__(self, name, age, specialization):\n        super().__init__(name, age)\n        self.specialization = specialization\n\n    def show_trainer(self):\n        print(f"Specialization: {self.specialization}")\n\n\nclass TechLead(Manager, Trainer):\n    def __init__(self, name, age, employee_id, team_size, specialization, project):\n        # Call only Manager.__init__ to initialize Person, Employee, Manager\n        Manager.__init__(self, name, age, employee_id, team_size)\n        # Only assign Trainer-specific attributes manually (avoid calling Person again)\n        self.specialization = specialization\n        self.project = project\n\n    def show_techlead(self):\n        print(f"Project: {self.project}")\n\n\n# Input\nname, age, emp_id, team_size, specialization, project = input().split()\nage = int(age)\nteam_size = int(team_size)\n\n# Create TechLead object\nt = TechLead(name, age, emp_id, team_size, specialization, project)\n\n# Print the details\nt.show_person()\nt.show_employee()\nt.show_manager()\nt.show_trainer()\nt.show_techlead()` },
+
+                { isHeader: true, title: "Polymorphism" },
+                { title: "1. Method...", code: `class Calculator:\n    def add(self, num1, num2, num3=None):\n        if num3 is not None:\n            return num1 + num2 + num3\n        return num1 + num2\n\n# Read input\nnum1 = int(input())\nnum2 = int(input())\n# Try to read optional third number\ntry:\n    num3 = input()\n    if num3.strip() == "":\n        num3 = None\n    else:\n        num3 = int(num3)\nexcept EOFError:\n    num3 = None\n\ncalc = Calculator()\n\n# Output the result\nif num3 is not None:\n    print(calc.add(num1, num2, num3))\nelse:\n    print(calc.add(num1, num2))` },
+                { title: "2. Polymorphism...", code: `# Define the classes\nclass Cat:\n    def speak(self):\n        return "Meow!"\n\nclass Dog:\n    def speak(self):\n        return "Woof!"\n\n# Function demonstrating polymorphism\ndef make_animal_speak(animal):\n    print(animal.speak())\n\n# Take input from user\nanimal_type = input()\n\n# Create object based on input and call the function\nif animal_type == "Cat":\n    animal = Cat()\n    make_animal_speak(animal)\nelif animal_type == "Dog":\n    animal = Dog()\n    make_animal_speak(animal)\nelse:\n    print("Unknown animal")#Enhance your coding skills, start writing your code here!!` },
+                { title: "3. Appliance...", code: `# Base class\nclass Appliance:\n    def __init__(self, power):\n        self.power = power  # in watts per hour\n\n    def calculateBill(self, hours_per_day):\n        # This will be overridden in derived classes\n        pass\n\n# Derived classes\nclass Fan(Appliance):\n    def __init__(self):\n        super().__init__(70)\n\n    def calculateBill(self, hours_per_day):\n        units = (self.power * hours_per_day * 30) / 1000\n        return units * 6\n\nclass AirConditioner(Appliance):\n    def __init__(self):\n        super().__init__(1500)\n\n    def calculateBill(self, hours_per_day):\n        units = (self.power * hours_per_day * 30) / 1000\n        return units * 6\n\nclass Refrigerator(Appliance):\n    def __init__(self):\n        super().__init__(200)\n\n    def calculateBill(self, hours_per_day):\n        units = (self.power * hours_per_day * 30) / 1000\n        return units * 6\n\n# Dictionary to map input string to class\nappliance_map = {\n    "Fan": Fan,\n    "AirConditioner": AirConditioner,\n    "Refrigerator": Refrigerator\n}\n\n# Input and processing\nT = int(input())\nfor _ in range(T):\n    appliance_type = input()\n    hours = int(input())\n    \n    if appliance_type in appliance_map:\n        appliance = appliance_map[appliance_type]()\n        bill = appliance.calculateBill(hours)\n        print(f"{bill:.2f}")\n    else:\n        print("Unknown appliance")` },
+                { title: "4. Polymorphism in...", code: `class Calculator:\n    def multiply(self, num1, num2, num3=None):\n        if num3 is not None:\n            return num1 * num2 * num3\n        else:\n            return num1 * num2\n\n# Input numbers\nnum1 = int(input())\nnum2 = int(input())\n\n# Try to read optional third number\ntry:\n    num3 = int(input())\nexcept:\n    num3 = None\n\n# Create calculator object and call multiply\ncalc = Calculator()\nresult = calc.multiply(num1, num2, num3)\nprint(result)#Enhance your coding skills, start writing your code here!!` },
+                { title: "5. Digital Devices...", code: `# Base class\nclass DigitalDevice:\n    def calculatePower(self, hours):\n        # To be overridden in derived classes\n        pass\n\n# Derived classes\nclass Smartphone(DigitalDevice):\n    def calculatePower(self, hours):\n        return 15 * hours\n\nclass Laptop(DigitalDevice):\n    def calculatePower(self, hours):\n        return 50 * hours\n\nclass Smartwatch(DigitalDevice):\n    def calculatePower(self, hours):\n        return 5 * hours\n\n# Map input string to class\ndevice_map = {\n    "Smartphone": Smartphone,\n    "Laptop": Laptop,\n    "Smartwatch": Smartwatch\n}\n\n# Input and processing\nT = int(input())\nfor _ in range(T):\n    device_type = input()\n    hours = int(input())\n    \n    if device_type in device_map:\n        device = device_map[device_type]()\n        power = device.calculatePower(hours)\n        print(power)\n    else:\n        print("Unknown device")` },
+                { title: "6. Area Calculator", code: `# Define the classes\nclass Rectangle:\n    def __init__(self, length, breadth):\n        self.length = length\n        self.breadth = breadth\n\n    def area(self):\n        return self.length * self.breadth\n\nclass Circle:\n    def __init__(self, radius):\n        self.radius = radius\n\n    def area(self):\n        pi = 3.1416\n        return pi * (self.radius ** 2)\n\n# Input\nshape = input().lower()\n\nif shape == "rectangle":\n    length, breadth = map(int, input().split())\n    obj = Rectangle(length, breadth)\n    print(f"{obj.area():.2f}")\nelif shape == "circle":\n    radius = int(input())\n    obj = Circle(radius)\n    print(f"{obj.area():.2f}")\nelse:\n    print("Unknown shape")` },
+                { title: "7. Employee Salary...", code: `# Base class\nclass Employee:\n    def calculate_salary(self):\n        pass  # To be overridden\n\n# Full-time employee\nclass FullTimeEmployee(Employee):\n    def __init__(self, base_salary, bonus):\n        self.base_salary = base_salary\n        self.bonus = bonus\n\n    def calculate_salary(self):\n        return self.base_salary + self.bonus\n\n# Part-time employee\nclass PartTimeEmployee(Employee):\n    def __init__(self, hours_worked, hourly_wage):\n        self.hours_worked = hours_worked\n        self.hourly_wage = hourly_wage\n\n    def calculate_salary(self):\n        return self.hours_worked * self.hourly_wage\n\n# Input\nemployee_type = input().lower()\ndata = list(map(int, input().split()))\n\nif employee_type == "fulltime":\n    emp = FullTimeEmployee(data[0], data[1])\nelif employee_type == "parttime":\n    emp = PartTimeEmployee(data[0], data[1])\nelse:\n    emp = None\n\n# Output\nif emp:\n    print(emp.calculate_salary())\nelse:\n    print("Unknown employee type")` },
+                { title: "8. Digit Dispatcher ...", code: `from abc import ABC, abstractmethod\nimport random\n\n# Abstract Base Class\nclass DigitSource(ABC):\n    def __init__(self, digit_string, priority, extra_flag):\n        self.digit_string = digit_string\n        self.priority = priority\n        self.extra_flag = extra_flag\n\n    @abstractmethod\n    def process(self):\n        pass\n\n# Sensor Source\nclass Sensor(DigitSource):\n    def process(self):\n        if self.extra_flag == "count_even":\n            even_count = sum(1 for d in self.digit_string if int(d) % 2 == 0)\n            print(f"[SUCCESS] Sensor processed {self.digit_string} with {even_count} even digits.")\n        elif self.extra_flag != "None":\n            print("Error: Only Sensor can count even digits.")\n        else:\n            print(f"[SUCCESS] Sensor processed {self.digit_string}.")\n\n# Stream Source\nclass Stream(DigitSource):\n    def process(self):\n        digit_sum = sum(int(d) for d in self.digit_string)\n        if digit_sum >= 100:\n            print("Error: Digit sum exceeds limit.")\n        else:\n            print(f"[SUCCESS] Stream processed {self.digit_string} with digit sum {digit_sum}.")\n\n# Wireless Source\nclass Wireless(DigitSource):\n    def process(self):\n        success = False\n        for attempt in range(1, 4):\n            print(f"Retrying Wireless processing for {self.digit_string}, attempt {attempt}...")\n            digit_sum = sum(int(d) for d in self.digit_string)\n            # Success if sum of digits is even\n            if digit_sum % 2 == 0:\n                success = True\n                print(f"[SUCCESS] Wireless processed {self.digit_string} successfully.")\n                break\n        if not success:\n            print(f"Error: Wireless dispatch failed for {self.digit_string}")\n\n# Map priority to numeric value for sorting\npriority_map = {"High": 1, "Medium": 2, "Low": 3}\n\n# Input processing\nn = int(input())\nentries = []\nfor _ in range(n):\n    parts = input().split()\n    source_type, digit_string, priority, extra_flag = parts\n    if source_type == "Sensor":\n        obj = Sensor(digit_string, priority, extra_flag)\n    elif source_type == "Stream":\n        obj = Stream(digit_string, priority, extra_flag)\n    elif source_type == "Wireless":\n        obj = Wireless(digit_string, priority, extra_flag)\n    else:\n        continue\n    entries.append(obj)\n\n# Sort by priority: High -> Medium -> Low\nentries.sort(key=lambda x: priority_map[x.priority])\n\n# Process each entry\nfor obj in entries:\n    obj.process()` },
+
+                { isHeader: true, title: "Abstraction" },
+                { title: "1. Vehicle Toll...", code: `from abc import ABC, abstractmethod\n\n# Abstract Base Class\nclass Vehicle(ABC):\n    \n    def __init__(self, distance):\n        self.distance = distance\n\n    @abstractmethod\n    def calculateToll(self):\n        pass\n\n\n# Derived Classes\nclass Car(Vehicle):\n    def calculateToll(self):\n        return self.distance * 1\n\n\nclass Bus(Vehicle):\n    def calculateToll(self):\n        return self.distance * 2\n\n\nclass Truck(Vehicle):\n    def calculateToll(self):\n        return self.distance * 3\n\n\n# Main Logic\nT = int(input())\n\nfor _ in range(T):\n    vehicle_type = input().strip()\n    distance = int(input().strip())\n\n    if vehicle_type == "Car":\n        vehicle = Car(distance)\n    elif vehicle_type == "Bus":\n        vehicle = Bus(distance)\n    elif vehicle_type == "Truck":\n        vehicle = Truck(distance)\n\n    print(vehicle.calculateToll())` },
+                { title: "2. Online Payment...", code: `from abc import ABC, abstractmethod\n\n# Abstract Base Class\nclass Payment(ABC):\n    \n    def __init__(self, amount):\n        self.amount = amount\n\n    @abstractmethod\n    def calculateFee(self):\n        pass\n\n\n# Derived Classes\nclass CreditCard(Payment):\n    def calculateFee(self):\n        return self.amount * 0.02\n\n\nclass DebitCard(Payment):\n    def calculateFee(self):\n        return self.amount * 0.01\n\n\nclass UPI(Payment):\n    def calculateFee(self):\n        return 0.0\n\n\n# Main Logic\nT = int(input())\n\nfor _ in range(T):\n    method = input().strip()\n    amount = float(input().strip())\n\n    if method == "CreditCard":\n        payment = CreditCard(amount)\n    elif method == "DebitCard":\n        payment = DebitCard(amount)\n    elif method == "UPI":\n        payment = UPI(amount)\n\n    print(float(payment.calculateFee()))` },
+                { title: "3. Exam Result...", code: `from abc import ABC, abstractmethod\n\n# Abstract Base Class\nclass Course(ABC):\n    \n    @abstractmethod\n    def getGrade(self):\n        pass\n\n\n# Derived Class for Theory Course\nclass TheoryCourse(Course):\n    \n    def __init__(self, scores):\n        self.scores = scores\n\n    def getGrade(self):\n        average = sum(self.scores) / 3\n\n        if average >= 90:\n            return "A"\n        elif average >= 75:\n            return "B"\n        elif average >= 60:\n            return "C"\n        else:\n            return "F"\n\n\n# Derived Class for Lab Course\nclass LabCourse(Course):\n    \n    def __init__(self, result):\n        self.result = result\n\n    def getGrade(self):\n        if self.result == 1:\n            return "Pass"\n        else:\n            return "Fail"\n\n\n# Main Logic\nT = int(input())\n\nfor _ in range(T):\n    course_type = input().strip()\n\n    if course_type == "TheoryCourse":\n        scores = list(map(int, input().split()))\n        course = TheoryCourse(scores)\n    elif course_type == "LabCourse":\n        result = int(input().strip())\n        course = LabCourse(result)\n\n    print(course.getGrade())` },
+                { title: "4. Employee Salary...", code: `from abc import ABC, abstractmethod\n\nclass Employee(ABC):\n    \n    @abstractmethod\n    def calculateSalary(self):\n        pass\n\n\nclass Intern(Employee):\n    \n    def calculateSalary(self):\n        return 5000\n\n\nclass FullTimeEmployee(Employee):\n    \n    def __init__(self, basic_pay):\n        self.basic_pay = basic_pay\n\n    def calculateSalary(self):\n        return self.basic_pay + (0.30 * self.basic_pay) + (0.20 * self.basic_pay)\n\n\nclass Freelancer(Employee):\n    \n    def __init__(self, hourly_rate, hours):\n        self.hourly_rate = hourly_rate\n        self.hours = hours\n\n    def calculateSalary(self):\n        return self.hourly_rate * self.hours\n\n\n# Main\nT = int(input())\n\nfor _ in range(T):\n    emp_type = input().strip()\n    \n    if emp_type == "Intern":\n        employee = Intern()\n    \n    elif emp_type == "FullTimeEmployee":\n        basic_pay = float(input().strip())\n        employee = FullTimeEmployee(basic_pay)\n    \n    elif emp_type == "Freelancer":\n        hourly_rate, hours = map(int, input().split())\n        employee = Freelancer(hourly_rate, hours)\n    \n    print(employee.calculateSalary())` },
+                { title: "5. Student Transpo...", code: `from abc import ABC, abstractmethod\n\nclass Employee(ABC):\n    \n    @abstractmethod\n    def calculateSalary(self):\n        pass\n\n\nclass Intern(Employee):\n    \n    def calculateSalary(self):\n        return 5000\n\n\nclass FullTimeEmployee(Employee):\n    \n    def __init__(self, basic_pay):\n        self.basic_pay = basic_pay\n\n    def calculateSalary(self):\n        return self.basic_pay + (0.30 * self.basic_pay) + (0.20 * self.basic_pay)\n\n\nclass Freelancer(Employee):\n    \n    def __init__(self, hourly_rate, hours):\n        self.hourly_rate = hourly_rate\n        self.hours = hours\n\n    def calculateSalary(self):\n        return self.hourly_rate * self.hours\n\n\n# Main\nT = int(input())\n\nfor _ in range(T):\n    emp_type = input().strip()\n    \n    if emp_type == "Intern":\n        employee = Intern()\n    \n    elif emp_type == "FullTimeEmployee":\n        basic_pay = float(input().strip())\n        employee = FullTimeEmployee(basic_pay)\n    \n    elif emp_type == "Freelancer":\n        hourly_rate, hours = map(int, input().split())\n        employee = Freelancer(hourly_rate, hours)\n    \n    print(employee.calculateSalary())` },
+                { title: "6. Smart Appliance...", code: `from abc import ABC, abstractmethod\n\nclass Appliance(ABC):\n\n    @abstractmethod\n    def turn_on(self):\n        pass\n\n    @abstractmethod\n    def turn_off(self):\n        pass\n\n\nclass WashingMachine(Appliance):\n\n    def turn_on(self):\n        print("Washing Machine is now ON")\n\n    def turn_off(self):\n        print("Washing Machine is now OFF")\n\n\nclass Refrigerator(Appliance):\n\n    def turn_on(self):\n        print("Refrigerator is now ON")\n\n    def turn_off(self):\n        print("Refrigerator is now OFF")\n\n\n# Mapping appliance names to classes\nappliance_map = {\n    "WashingMachine": WashingMachine,\n    "Refrigerator": Refrigerator\n}\n\n# Main\nN = int(input().strip())\n\nfor _ in range(N):\n    name = input().strip()\n    \n    appliance_class = appliance_map.get(name)\n    if appliance_class:\n        appliance = appliance_class()\n        appliance.turn_on()\n        appliance.turn_off()` },
+                { title: "7. Payment Gatewa...", code: `from abc import ABC, abstractmethod\n\n# Abstract Base Class\nclass PaymentMethod(ABC):\n\n    @abstractmethod\n    def pay(self, amount):\n        pass\n\n\n# Credit Card Payment Class\nclass CreditCardPayment(PaymentMethod):\n\n    def pay(self, amount):\n        print(f"Paid {amount} using Credit Card")\n\n\n# UPI Payment Class\nclass UPIPayment(PaymentMethod):\n\n    def pay(self, amount):\n        print(f"Paid {amount} using UPI")\n\n\n# Function to process payment\ndef process_payment(method, amount):\n    if method == "CreditCard":\n        payment = CreditCardPayment()\n    elif method == "UPI":\n        payment = UPIPayment()\n    else:\n        return\n    \n    payment.pay(amount)\n\n\n# Main\nmethod = input().strip()\namount = int(input().strip())\n\nprocess_payment(method, amount)` },
+                { title: "8. Robot Control...", code: `from abc import ABC, abstractmethod\nfrom typing import List, Tuple\n\n# Abstract Base Class\nclass Robot(ABC):\n\n    @abstractmethod\n    def start(self):\n        pass\n\n    @abstractmethod\n    def stop(self):\n        pass\n\n    @abstractmethod\n    def move(self, direction: str, distance: float):\n        pass\n\n    @abstractmethod\n    def energy_required(self, distance: float) -> float:\n        pass\n\n\n# Concrete Robots\nclass WheeledRobot(Robot):\n\n    def start(self):\n        pass  # Can add start logic if needed\n\n    def stop(self):\n        pass  # Can add stop logic if needed\n\n    def move(self, direction: str, distance: float):\n        print(f"Wheeled robot moving {distance:.1f}m towards {direction}.")\n        print(f"Energy consumed: {self.energy_required(distance):.1f} units")\n\n    def energy_required(self, distance: float) -> float:\n        return distance / 10.0  # 1 unit per 10 meters\n\n\nclass Drone(Robot):\n\n    def start(self):\n        pass\n\n    def stop(self):\n        pass\n\n    def move(self, direction: str, distance: float):\n        if distance > 100:\n            raise ValueError("Drone cannot move more than 100 meters")\n        print(f"Drone flying {distance:.1f}m towards {direction}.")\n        print(f"Energy consumed: {self.energy_required(distance):.1f} units")\n\n    def energy_required(self, distance: float) -> float:\n        return distance * 2.0  # 2 units per meter\n\n\nclass RoboticArm(Robot):\n\n    valid_directions = {"up", "down", "left", "right"}\n\n    def start(self):\n        pass\n\n    def stop(self):\n        pass\n\n    def move(self, direction: str, distance: float):\n        if direction not in self.valid_directions:\n            raise ValueError(f"Invalid direction for RoboticArm: {direction}")\n        print(f"Robotic arm shifting {direction} by {distance:.1f} units.")\n        print(f"Energy consumed: {self.energy_required(distance):.1f} units")\n\n    def energy_required(self, distance: float) -> float:\n        return 5.0  # flat energy per move\n\n\n# Controller function\ndef operate_robots(robots: List[Robot], instructions: List[Tuple[str, float]]):\n    for robot, (direction, distance) in zip(robots, instructions):\n        robot.start()\n        robot.move(direction, distance)\n        robot.stop()\n\n\n# Main logic\nN = int(input())\nrobots = []\ninstructions = []\n\nfor _ in range(N):\n    parts = input().split()\n    robot_type, direction, distance = parts[0], parts[1], float(parts[2])\n\n    if robot_type == "Wheeled":\n        robot = WheeledRobot()\n    elif robot_type == "Drone":\n        robot = Drone()\n    elif robot_type == "RoboticArm":\n        robot = RoboticArm()\n    else:\n        raise ValueError(f"Unknown robot type: {robot_type}")\n\n    robots.append(robot)\n    instructions.append((direction, distance))\n\noperate_robots(robots, instructions)` },
+
+{ isHeader: true, title: "Decorators, iterators" },
+                { title: "1. Validate Even...", code: `# Decorator to check if all numbers are even\ndef validate_even(func):\n    def wrapper(*args):\n        if all(num % 2 == 0 for num in args):\n            return "All even"\n        else:\n            return "Not all even"\n    return wrapper\n\n# Example function (its actual logic is not important)\n@validate_even\ndef check_numbers(*nums):\n    pass  # function body is ignored because decorator handles output\n\n# Main\nnumbers = list(map(int, input().split()))\nprint(check_numbers(*numbers))` },
+                { title: "2. Custom Iterator...", code: `# Custom iterator class\nclass MyRange:\n    def __init__(self, start, end):\n        self.current = start\n        self.end = end\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.current > self.end:\n            raise StopIteration\n        value = self.current\n        self.current += 1\n        return value\n\n# Main\nstart, end = map(int, input().split())\nfor num in MyRange(start, end):\n    print(num)` },
+                { title: "3. Convert Functio...", code: `# Decorator to convert output to uppercase\ndef uppercase_decorator(func):\n    def wrapper(*args, **kwargs):\n        result = func(*args, **kwargs)\n        return result.upper()\n    return wrapper\n\n# Example function\n@uppercase_decorator\ndef get_text(text):\n    return text\n\n# Main\ntext = input()\nprint(get_text(text))` },
+                { title: "4. Repeater...", code: `# Decorator to repeat output 3 times\ndef repeater(func):\n    def wrapper(*args, **kwargs):\n        result = func(*args, **kwargs)\n        return "\\n".join([result] * 3)\n    return wrapper\n\n# Example function\n@repeater\ndef get_text(text):\n    return text\n\n# Main\ntext = input()\nprint(get_text(text))` },
+                { title: "5. Range Iterator...", code: `# Custom iterator class\nclass RangeIterator:\n    def __init__(self, start, end):\n        self.current = start\n        self.end = end\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.current > self.end:\n            raise StopIteration\n        value = self.current\n        self.current += 1\n        return value\n\n# Main\nstart, end = map(int, input().split())\nnumbers = list(RangeIterator(start, end))\nprint(numbers)` },
+                { title: "6. Even Numbers...", code: `# Custom iterator for even numbers\nclass EvenNumbers:\n    def __init__(self, start, end):\n        # Make sure we start at the first even number\n        self.current = start if start % 2 == 0 else start + 1\n        self.end = end\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.current > self.end:\n            raise StopIteration\n        value = self.current\n        self.current += 2  # jump to next even\n        return value\n\n# Main\nstart, end = map(int, input().split())\nfor num in EvenNumbers(start, end):\n    print(num)` },
+                { title: "7. Square Decorator", code: `# Decorator to square the output\ndef square_decorator(func):\n    def wrapper(*args, **kwargs):\n        result = func(*args, **kwargs)\n        return result ** 2\n    return wrapper\n\n# Function to get a number\n@square_decorator\ndef get_number(n):\n    return n\n\n# Main\nn = int(input())\nprint(get_number(n))` },
+                { title: "8. Iterator Decorat...", code: `# Custom iterator class\nclass StringIterator:\n    def __init__(self, strings):\n        self.strings = strings\n        self.index = 0\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.index >= len(self.strings):\n            raise StopIteration\n        value = self.strings[self.index]\n        self.index += 1\n        return value\n\n# Decorator to capitalize all words\ndef capitalize_words(func):\n    def wrapper(s):\n        s = func(s)\n        return ' '.join(word.capitalize() for word in s.split())\n    return wrapper\n\n# Decorator to replace vowels with '*'\ndef replace_vowels(func):\n    def wrapper(s):\n        s = func(s)\n        vowels = "aeiouAEIOU"\n        return ''.join('*' if c in vowels else c for c in s)\n    return wrapper\n\n# Decorator to append string length\ndef append_length(func):\n    def wrapper(s):\n        s = func(s)\n        return f"{s} ({len(s)})"\n    return wrapper\n\n# Compose all decorators\n@append_length\n@replace_vowels\n@capitalize_words\ndef transform(s):\n    return s\n\n# Main\nn = int(input())\nstrings = [input().strip() for _ in range(n)]\n\nfor s in StringIterator(strings):\n    print(transform(s))` },
+
+                { isHeader: true, title: "Generators, and Context Managers" },
+                { title: "1. Generators -...", code: `# Generator function for Fibonacci sequence\ndef fibonacci_gen(n):\n    a, b = 0, 1\n    for _ in range(n):\n        yield a\n        a, b = b, a + b\n\n# Main\nn = int(input())\nfib_sequence = list(fibonacci_gen(n))\nprint(fib_sequence)#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Count Published...", code: `# Main\nn = int(input())\nstatuses = input().split()\n\n# Count "published"\npublished_count = statuses.count("published")\nprint(published_count)#Enhance your coding skills, start writing your code here!!` },
+                { title: "3. Even Number...", code: `# Generator for even numbers\ndef generate_evens(n):\n    for i in range(0, n, 2):\n        yield i\n\n# Main\nn = int(input())\nevens = list(generate_evens(n))\nprint(*evens)` },
+                { title: "4. Add Hello Prefix...", code: `# Decorator to add "Hello, " prefix\ndef add_hello_prefix(func):\n    def wrapper(message):\n        return "Hello, " + func(message)\n    return wrapper\n\n# Function to return message\n@add_hello_prefix\ndef greet(message):\n    return message\n\n# Main\nmessage = input().strip()\nprint(greet(message))` },
+                { title: "5. File Content...", code: `# Custom context manager to simulate file-like line reading\nclass InputReader:\n    def __init__(self, n):\n        self.n = n\n        self.lines = []\n\n    def __enter__(self):\n        for _ in range(self.n):\n            self.lines.append(input())\n        self.index = 0\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        pass\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.index >= self.n:\n            raise StopIteration\n        line = self.lines[self.index]\n        self.index += 1\n        return line.rstrip('\\n')  # Remove trailing newline if present\n\n# Main\nn = int(input())\nwith InputReader(n) as reader:\n    for line in reader:\n        print(line)` },
+                { title: "6. Range Generator...", code: `# Context manager for range generator\nclass RangeGenerator:\n    def __init__(self, start, end):\n        self.start = start\n        self.end = end\n        self.total = 0\n\n    def __enter__(self):\n        # Generator to yield numbers one by one\n        self.generator = self._gen()\n        return self.generator\n\n    def _gen(self):\n        for i in range(self.start, self.end):\n            self.total += i\n            yield i\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        print(self.total)\n\n\n# Main\nstart, end = map(int, input().split())\n\nwith RangeGenerator(start, end) as numbers:\n    for _ in numbers:\n        pass  # Iteration triggers generator and totals sum` },
+                { title: "7. Prime Numbers...", code: `# Generator to yield first n prime numbers\ndef prime_generator(n):\n    count = 0\n    num = 2\n    while count < n:\n        # Check if num is prime\n        for i in range(2, int(num ** 0.5) + 1):\n            if num % i == 0:\n                break\n        else:\n            yield num\n            count += 1\n        num += 1\n\n# Main\nn = int(input())\nfor prime in prime_generator(n):\n    print(prime)` },
+                { title: "8. StreamGuard:...", code: `# Context manager for streaming log filtering\nclass StreamGuard:\n    def __init__(self, logs, keyword, min_length):\n        self.logs = logs\n        self.keyword = keyword.lower()\n        self.min_length = min_length\n        self.filtered_count = 0\n\n    def __enter__(self):\n        # Generator to yield logs one by one\n        def log_generator():\n            for log in self.logs:\n                if self.keyword in log.lower() and len(log) >= self.min_length:\n                    self.filtered_count += 1\n                    yield log\n        self.generator = log_generator()\n        return self.generator\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        print(self.filtered_count)\n\n\n# Main\nn = int(input())\nlogs = [input().strip() for _ in range(n)]\nkeyword = input().strip()\nmin_length = int(input())\n\nwith StreamGuard(logs, keyword, min_length) as filtered_logs:\n    for log in filtered_logs:\n        print(log)` },
+
+
+                { isHeader: true, title: "Module Test" }
+            ],
+            "module-6-list": [
+                { isHeader: true, title: "File handling" },
+                { isHeader: true, title: "Testing" },
+                { isHeader: true, title: "Debugging Tools" },
+                { isHeader: true, title: "Error Handling" },
+                { title: "1. Try, Except", code: `# Main
+try:
+    numerator = float(input())
+    denominator = float(input())
+    result = numerator / denominator
+    print(result)
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
+except ValueError:
+    print("Error: Invalid input. Please enter numeric values.")#Enhance your coding skills, start writing your code here!!` },
+                { title: "2. Try, Except, Except", code: `try:
+    numerator = float(input())
+    denominator = float(input())
+    result = numerator / denominator
+    print(result)
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
+except ValueError:
+    print("Error: Invalid input. Please enter numeric values.")
+except Exception as e:
+    print(f"Error: An unexpected error occurred. ({e})")` },
+                { title: "3. Try, Except, Else", code: `try:
+    numerator = float(input())
+    denominator = float(input())
+    result = numerator / denominator   # division inside try
+except ValueError:
+    print("Error: Invalid input. Please enter numeric values.")
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
+else:
+    # Executes only if no exception occurred
+    print(result)` },
+                { title: "4. Try, Except, Finally", code: `try:
+    numerator = float(input())
+    denominator = float(input())
+    result = numerator / denominator
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
+except ValueError:
+    print("Error: Invalid input. Please enter numeric values.")
+else:
+    # Executes only if no exception occurred
+    print(result)
+finally:
+    # Always executes
+    print("This message is from the finally block, always executed.")` },
+                { title: "5. Custom Exception", code: `# Define a custom exception
+class AgeTooLowException(Exception):
+    def __init__(self, message="You must be at least 18 years old to vote."):
+        self.message = message
+        super().__init__(self.message)
+
+# Main program
+try:
+    age = int(input())
+    if age < 18:
+        raise AgeTooLowException()
+    else:
+        print("You are eligible to vote.")
+except AgeTooLowException as e:
+    print(e)
+except ValueError:
+    print("Invalid input. Please enter a valid integer for age.")#Enhance your coding skills, start writing your code here!!` },
+                { title: "6. Add two integer...", code: `try:
+    num1 = int(input())
+    num2 = int(input())
+    print(num1 + num2)
+except ValueError:
+    print("Invalid input. Please enter valid integers.")#Enhance your coding skills, start writing your code here!!` },
+                { title: "7. Raising user...", code: `# Define a custom exception for negative numbers
+class NegativeNumberError(Exception):
+    def __init__(self, message="Negative numbers are not allowed."):
+        self.message = message
+        super().__init__(self.message)
+
+# Main program
+try:
+    num = int(input())
+    if num < 0:
+        raise NegativeNumberError()
+    else:
+        print("Valid number.")
+except NegativeNumberError as e:
+    print(e)
+except ValueError:
+    print("Invalid input. Please enter an integer.")` },
+                { title: "8. Handling...", code: `try:
+    numerator = float(input())
+    denominator = float(input())
+    result = numerator / denominator
+    print(result)
+except ZeroDivisionError:
+    print("Error: Cannot divide by zero.")
+except ValueError:
+    print("Error: Invalid input. Please enter numeric values.")#Enhance your coding skills, start writing your code here!!` },
+                { title: "9. Handling Multipl...", code: `try:
+    num = int(input())
+    print(f"You entered the integer: {num}")
+except (ValueError, TypeError):
+    print("Error: Invalid input. Please enter a valid integer.")#Enhance your coding skills, start writing your code here!!` },
+                { title: "10. Using Finally...", code: `try:
+    numerator = float(input())
+    denominator = float(input())
+    result = numerator / denominator
+    print(f"Result: {result}")
+except ZeroDivisionError:
+    print("Error: Cannot divide by zero.")
+except ValueError:
+    print("Error: Invalid input. Please enter numeric values.")
+finally:
+    print("Execution of the try-except block is complete.")#Enhance your coding skills, start writing your code here!!` },
+                { title: "11. Raising...", code: `def check_positive(num):
+    if num <= 0:
+        raise ValueError("The number must be positive.")
+    else:
+        print("The number is positive.")
+
+try:
+    n = int(input())
+    check_positive(n)
+except ValueError as ve:
+    print(ve)#Enhance your coding skills, start writing your code here!!` },
+                { title: "12. Creating a...", code: `# Define the custom exception
+class NegativeValueError(Exception):
+    pass
+
+# Function to check value
+def check_value(value):
+    if value < 0:
+        raise NegativeValueError("Negative values are not allowed.")
+    else:
+        print("The value is positive.")
+
+# Main
+try:
+    n = int(input())
+    check_value(n)
+except NegativeValueError as e:
+    print(e)` },
+                { isHeader: true, title: "Module Test" }
+            ],
+            "module-7-list": [
+                { isHeader: true, title: "Introduction to NumPy" },
+                { isHeader: true, title: "Pandas for Data Manipulation" },
+                { isHeader: true, title: "Regular Expressions (REGEX)" },
+                { isHeader: true, title: "Module Test" }
+            ],
+            "module-8-list": [
+                { isHeader: true, title: "GUI frameworks: Tkinter and PySimpleGUI" },
+                { isHeader: true, title: "GUI components" },
+                { isHeader: true, title: "Event-driven Programming" },
+                { isHeader: true, title: "File Handling and Network Requests" },
+                { isHeader: true, title: "Module Test" }
+            ],
+            "module-9-list": [
+                { isHeader: true, title: "Network Requests" },
+                { isHeader: true, title: "Asyncio - Asynchronous Programming" },
+                { isHeader: true, title: "Module Test" }
+            ]
+        };
+
+        // --- POPULATE HTML ---
+        for (const [listId, topics] of Object.entries(courseData)) {
+            const ulElement = document.getElementById(listId);
+            if(ulElement) {
+                topics.forEach(topic => {
+                    const li = document.createElement('li');
+                    
+                    // Check if it's a Sub-Header or a normal Coding Problem
+                    if (topic.isHeader) {
+                        li.className = "sub-header";
+                        li.innerText = topic.title;
+                    } else {
+                        li.innerHTML = `
+                            <div class="topic-row">
+                                <span>${topic.title}</span>
+                                <button class="view-btn">View Code</button>
+                            </div>
+                            <div class="code-container">
+                                <button class="copy-btn">Copy Code</button>
+<pre><code>${topic.code}</code></pre>
+                            </div>
+                        `;
+                    }
+                    ulElement.appendChild(li);
+                });
+            }
+        }
+
+        // --- ACCORDION LOGIC ---
+        const modules = document.querySelectorAll('.module');
+        modules.forEach(module => {
+            const header = module.querySelector('.module-header');
+            header.addEventListener('click', () => {
+                const isActive = module.classList.contains('active');
+                modules.forEach(m => m.classList.remove('active')); // Close all
+                if (!isActive) module.classList.add('active'); // Open clicked if it was closed
+            });
+        });
+
+        // --- VIEW CODE BUTTON LOGIC ---
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('view-btn')) {
+                const codeContainer = e.target.parentElement.nextElementSibling;
+                codeContainer.classList.toggle('show');
+                e.target.innerText = codeContainer.classList.contains('show') ? "Hide Code" : "View Code";
+            }
+        });
+
+        // --- BULLETPROOF COPY LOGIC & TOAST POPUP ---
+        const toast = document.getElementById('toast');
+        let toastTimeout;
+
+        function showToast(message) {
+            toast.innerText = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000); 
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('copy-btn')) {
+                const codeText = e.target.nextElementSibling.innerText;
+                const textArea = document.createElement("textarea");
+                textArea.value = codeText;
+                textArea.style.position = "fixed";
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.width = "2em";
+                textArea.style.height = "2em";
+                textArea.style.padding = "0";
+                textArea.style.border = "none";
+                textArea.style.outline = "none";
+                textArea.style.boxShadow = "none";
+                textArea.style.background = "transparent";
+                document.body.appendChild(textArea);
+                
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showToast("✅ Copied!!");
+                    } else {
+                        showToast("❌ Could not copy");
+                    }
+                } catch (err) {
+                    showToast("❌ Error copying text");
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        });
+    </script>
+</body>
+</html>
